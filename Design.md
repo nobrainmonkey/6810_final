@@ -18,7 +18,7 @@ Author: Xihe Han
 - [ ] Micro-sate visualization. (Maybe omitted)
 - [ ] Micro-sate enumeration using Metropolis–Hastings algorithm (MCMC).
 - [ ] Observables calculation.
-- [ ] Parallel computing using `Openmp. `
+- [ ] Parallel computing using `Openmp`.
 
 ### Graphical Representation
 - [ ] Graph calculated observables under different conditions.
