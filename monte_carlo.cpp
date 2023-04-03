@@ -7,7 +7,7 @@
 using namespace arma;
 using namespace std;
 
-const int dimension = 10000;
+const int dimension = 400;
 
 void Randomize_unit_matrix(mat* A);
 
