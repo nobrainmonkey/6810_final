@@ -69,48 +69,84 @@ Because we are using `c++`, we should embrace the modularity of `OOP`. This mean
 
 #### Microstate
 
-The `Microstate` class should inlucde everything we need to describe the microstate of out spin system. This should include **a complete microscopic description of our microstate.** However, any macroscopic quantities will Not be covered here. Because we are dealing with a 2-D lattice, we shall use a 2-D array from `eigen` to represent this state.
+The `Microstate` class should inlucde everything we need to describe the microstate of out spin system. This should include **a complete microscopic description of our microstate.** However, any macroscopic quantities will Not be covered here. Because we are dealing with a 2-D lattice, we shall use a 2-D array from `eigen` to represent this state.  To define this lattice, we must define the row number and col number.
+
+The `Microstate` class should have the following structure
 
 ```
+class Microstate (int row, int col)
+
+
+// Hamiltonian class need to access the number of row and col.
+private: 
+int rownum = row 
+int colnum = col 
+// function prototype for initialize microsate
+mat* Initialize_matrix(int row, int col)
+// Create initial matrix 
+mat* microstate_matrix = Initialize_matrix(rownum, colnum)
+
+// getter and setter function for row, col, and microstate_matrix
+
+
+
+
+// Initialize the microsotate to be a row X col matrix with random values from -1 to 1 defined by eigen
+mat * Initialize_matrix(int row, int col){
+mat A = new mat (row, col, fill:randomu)
+for (i=0; i < row; i++){
+	for(j = 0; j < col; j++){
+		if A(i, j) < = 0 -> A(i,j) = -1
+		else A(i,j) = 1
+	}
+}
+return * mat A
+}
 
 ```
-
 
 #### Hamiltonian
 
-The main function of our Hamiltonian class is to **calcuate the energy of a given microsate.** Because energy is a macroscopic quantity, we probably will never deriectly utilize this class in our `main` function, but this Hamiltonian will be used for our macroscopic quantities' calculation.
+The main function of our Hamiltonian class is to **calcuate the energy of a given microsate.** Because energy is a macroscopic quantity, we probably will never deriectly utilize this class in our `main` function, but this Hamiltonian will be used for our macroscopic quantities' calculation. This probably won't be a class but merely a header file and source file for other classes.
 
 ```
-class Hamiltonian (microstate* micro_state)
-private: double J, doubhe h
-double J = micro_state.get(J)
-doubel h = micro_state.get(h)
+Hamiltonian.h
 
+double hamiltonian_ising_function(int i, int j, void * hamiltonian_param)
+// code the hamiltonian here, return the ith row and jth col energy for ising model-> E = - J sum_<ij> S_i S_j - h* S_i
+// where J, h are stored in param
 
-double Get_element_energy(microstate* microstate, int i, int j)
-// return the ith row, jth col spin energy calculation using E = - J sum_<ij> S_i S_j - h* S_i
+double Get_ising_element_energy(microstate* microstate, int i, int j, &hamiltonian_ising_function)
+// return the ith row, jth col spin energy calculation using hamiltonian_ising_function
 // where <ij> stands for the nearest neightbor of spin located at (i,j) with periodic boundary condition
 
-double Get_microstate_energy(microstate* microstate)
+double Get_ising_microstate_energy(microstate* microstate, &hamiltonian_ising_function)
 //return the total energy of the entire microstate by intrearting through every element of the microstate 
 //and calling Get_element_energy()
 
+
 ```
 
-Note: 
+Note:
 
 * The nearest neightbor of periodic B.C. will probably be some what difficult. Now all I can think of is using `mod` operator. I might seperate this part out to another function in this class.
 
+#### MC
 
+MC package here should perform the markov-chain matropolis algorithm.  The algorithm should do the following:
 
-* We start from a random microstate.
+* We start from a random microstate. (by passing a microstate)
 * We flip a random spin in that microstate.
 * If the microstate energy becomes lower, we accept this change.
 * If the microstate energy becomes higher, we accept this change with probablity $e^{-\Delta E/T }$
 * Iterate for a large number until we reach equalibrium.
 
-* We start from a random microstate.
-* We flip a random spin in that microstate.
-* If the microstate energy becomes lower, we accept this change.
-* If the microstate energy becomes higher, we accept this change with probablity $e^{-\Delta E/T }$
-* Iterate for a large number until we reach equalibrium.
+Therefore, `MC` should have the following structure Note that as we are using MC as a calculator, this should merely be a header file with its sourcecode.
+
+```
+#include 'Hamiltonian.h'
+
+
+
+
+```
