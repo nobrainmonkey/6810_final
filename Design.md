@@ -15,11 +15,11 @@ Author: Xihe Han
 ### Computationally solve the problem of a 2-D two-level Ising model with a given Hamiltonian under a magnetic field $h$.
 
 - [X] Hamiltonian construction.
-- [ ] Microstate generation.
-- [ ] Micro-sate visualization. (Maybe omitted)
-- [ ] Micro-sate enumeration using Metropolis–Hastings algorithm (MCMC).
+- [X] Microstate generation.
+- [X] Micro-sate visualization. (Maybe omitted)
+- [X] Micro-sate enumeration using Metropolis–Hastings algorithm (MCMC).
 - [ ] Observables calculation.
-- [ ] Parallel computing using `Openmp`.
+- [X] Parallel computing using `Openmp`.
 
 ### Graphical Representation
 
@@ -234,5 +234,13 @@ Our main program should do the following:
 4. Define a temperature mesh `T_mesh.`
 5. Calculate the macroscopic quantities over `T_mesh.`
 6. Graph the macroscopic quantities.
+
+Thing to define in my main function
+
+```cpp
+hamiltonian_param_strcut // we define J and h as a field here
+omp_set_num_threads // set number of threads to use for omp
+row number, col number, Tempreature //for us to generate microstate of a given size and tempreature
+```
 
 # End
