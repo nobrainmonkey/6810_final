@@ -14,7 +14,8 @@ Author: Xihe Han
 
 ### Computationally solve the problem of a 2-D two-level Ising model with a given Hamiltonian under a magnetic field $h$.
 
-- [X] Microstate generation.
+- [X] Hamiltonian construction.
+- [ ] Microstate generation.
 - [ ] Micro-sate visualization. (Maybe omitted)
 - [ ] Micro-sate enumeration using Metropolis–Hastings algorithm (MCMC).
 - [ ] Observables calculation.
@@ -74,13 +75,9 @@ The `Microstate` class should include everything we need to describe the microst
 The `Microstate` should also be able to evolve according to the Metropolis algorithm:
 
 1. We start from a random microstate.
-
 2. We flip a random spin in that microstate.
-
 3. If the microstate energy becomes lower, we accept this change.
-
 4. If the microstate energy becomes higher, we accept this change with probability $e^{-\Delta E/T }$
-
 5. Iterate for a large number until we reach equilibrium.
 
 The `Microstate` class should have the following structure.
@@ -226,7 +223,6 @@ return get_magnetization(T+ deltaT) - get_magnetization(T) / delta T
 
 
 ```
-
 
 #### Main
 
