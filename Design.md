@@ -105,7 +105,8 @@ omp_set_num_threads(16);
 mat* Initialize_matrix(int row, int col)
 
 // Create initial matrix 
-mat* microstate_matrix = Initialize_matrix(rownum, colnum)
+mat* microstate_matrix = new mat(rownum, colnum, randomly fill between -1 and 1)
+Initialize_matrix(microstate_matrix)
 
 // getter and setter function for row, col, and microstate_matrix
 
@@ -113,8 +114,7 @@ mat* microstate_matrix = Initialize_matrix(rownum, colnum)
 
 
 // Initialize the microsotate to be a row X col matrix with random values from -1 to 1 defined by eigen
-mat * Initialize_matrix(int row, int col){
-mat A = new mat (row, col, fill:randomu)
+void Initialize_matrix(mat* A){
 for (i=0; i < row; i++){
 	for(j = 0; j < col; j++){
 		if A(i, j) < = 0 -> A(i,j) = -1
@@ -160,6 +160,12 @@ void evolve_microstate(int iteration){
 	}
 }
 
+// graphing function should go here 
+void print_microstate_matrix()
+{
+	// go through the matrix, print each element in a nice way 
+}
+
 
 ```
 
@@ -170,15 +176,17 @@ The main function of our Hamiltonian class is to **calculate the energy of a giv
 ```cpp
 Hamiltonian.h
 
-double hamiltonian_ising_function(int i, int j, void * hamiltonian_param)
-// code the hamiltonian here, return the ith row and jth col energy for ising model-> E = - J sum_<ij> S_i S_j - h* S_i
-// where J, h are stored in param
+struct hamiltonian_param_struct{
+	// Parameters regarding H should go here. For Ising model case, we have 
+	double J;
+	double h;
+}
 
-double Get_ising_element_energy(mat* microstate_matrix, int i, int j, &hamiltonian_ising_function)
+double Get_ising_element_energy(mat* microstate_matrix, int i, int j, hamiltonian_param_struct* hamiltonian_param)
 // return the ith row, jth col spin energy calculation using hamiltonian_ising_function
 // where <ij> stands for the nearest neightbor of spin located at (i,j) with periodic boundary condition
 
-double Get_ising_microstate_energy(mat* microstate_matrix, &hamiltonian_ising_function)
+double Get_ising_microstate_energy(mat* microstate_matrix, hamiltonian_param_struct* hamiltonian_param)
 //return the total energy of the entire microstate by intrearting through every element of the microstate 
 //and calling Get_element_energy()
 
@@ -241,6 +249,9 @@ Thing to define in my main function
 hamiltonian_param_strcut // we define J and h as a field here
 omp_set_num_threads // set number of threads to use for omp
 row number, col number, Tempreature //for us to generate microstate of a given size and tempreature
+
+
+// Maybe make a command line interface for us to change various settings!
 ```
 
 # End

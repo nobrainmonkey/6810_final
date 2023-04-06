@@ -58,9 +58,9 @@ Eigen::MatrixXd* Microstate::get_microstate_matrix_ptr(){
 // print the microstate matrix
 void Microstate::print_microstate_matrix(){
 	std::cout << "Microstate Matrix:" << std::endl;
-	for (int i = 0; i < rows; i++) {
+	for (int j = 0; j < cols; j++) {
 		std::cout << "| ";
-		for (int j = 0; j < cols; j++) {
+		for (int i = 0; i < rows; i++) {
 			std::cout << (*microstate_matrix_ptr)(i, j) << " ";
 		}
 		std::cout << "|" << std::endl;
@@ -74,8 +74,8 @@ void Microstate::print_microstate_matrix(){
 
 void Microstate::graph_microstate_matrix(){
 	std::cout << "Microstate Matrix:" << std::endl;
-	for (int i = 0; i < rows; i++) {
-		for (int j = 0; j < cols; j++) {
+	for (int j = 0; j < cols; j++) {
+		for (int i = 0; i < rows; i++) {
 			if ((*microstate_matrix_ptr)(i, j) == -1) {
 				std::cout << "  "; // print space for -1
 			} else {
@@ -122,17 +122,20 @@ void Microstate::evolve_microstate(int iteration){
 // graph the evolution process
 // this implementation is rather janky as I needed to use sleep to halt the program
 // The total amount of iteration this will graph is time / dt -1
+// note taht I have cleared the terminal at the very end. This command only works in *nix system
+// For windows user, you will need to change this to system("cls").
 void Microstate::graph_evolve(int time, int dt) {
     double t = 0.0;
     while (t < time) {
         // Update the microstate
-        evolve_microstate(50);
+        evolve_microstate(10000);
 
         // Graph the microstate matrix
         graph_microstate_matrix();
         // Wait for some time
 		std::this_thread::sleep_for(std::chrono::milliseconds(dt));
         t += dt;
+	system("clear");
     }
 }
 
@@ -143,9 +146,8 @@ int main()
 	hamiltonian_variables.J = 2;
 	hamiltonian_variables.h = 0.;
 	omp_set_num_threads(16);
-	Microstate microstate = Microstate(20, 20, 10, &hamiltonian_variables);
-	microstate.graph_microstate_matrix();
-	microstate.evolve_microstate(1000000);
-	microstate.graph_microstate_matrix();
+	Microstate microstate = Microstate(100, 100, 0.0, &hamiltonian_variables);
+	microstate.print_microstate_matrix();
+	microstate.graph_evolve(50000, 50);
 	std::cout<<"done!";
 }
