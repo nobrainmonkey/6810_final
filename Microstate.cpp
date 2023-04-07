@@ -146,8 +146,8 @@ int main()
 	hamiltonian_variables.J = 2;
 	hamiltonian_variables.h = 0.;
 	omp_set_num_threads(16);
-	Microstate microstate = Microstate(100, 100, 0.0, &hamiltonian_variables);
+	Microstate microstate = Microstate(50, 50, 0.0, &hamiltonian_variables);
 	microstate.print_microstate_matrix();
-	microstate.graph_evolve(50000, 50);
+	microstate.graph_evolve(500000, 10);
 	std::cout<<"done!";
 }
