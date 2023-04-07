@@ -33,7 +33,7 @@ namespace Observable{
 	// entropy of a microstate of a given
 	// dimension row x col by using numerical integration of Cv/T
 	// with step dT and a given hamiltonian parameters
-	double get_ising_entropy(double energy, double specific_heat, double T);
+	double get_ising_entropy(int row, int col, int iteration, int sample_size, hamiltonian_param_struct* hamiltonian_param_ptr, double lower_T, double upper_T, double dT);
 
 	// function prototype for calculating 
 	// magnetization of a microstate of a given
