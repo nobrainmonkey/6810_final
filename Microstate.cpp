@@ -45,7 +45,7 @@ void Microstate::initialize_microstate_matrix(Eigen::MatrixXd* microstate_matrix
 	#pragma omp parallel for
 	for (int i=0; i < rows; i++){
 		for(int j = 0; j < cols; j++){
-			(*microstate_matrix_ptr)(i,j) = dis(gen) ? 1 : -1; //shorthand for if-else statement 
+			(*microstate_matrix_ptr)(i,j) = dis(gen) ? double(1.) : double(-1.); //shorthand for if-else statement 
 		}
 	}
 }
@@ -76,7 +76,7 @@ void Microstate::graph_microstate_matrix(){
 	std::cout << "Microstate Matrix:" << std::endl;
 	for (int j = 0; j < cols; j++) {
 		for (int i = 0; i < rows; i++) {
-			if ((*microstate_matrix_ptr)(i, j) == -1) {
+			if ((*microstate_matrix_ptr)(i, j) == -1.) {
 				std::cout << "  "; // print space for -1
 			} else {
 				std::cout << "██"; // print white square for 1
@@ -101,7 +101,7 @@ void Microstate::evolve_microstate(int iteration){
 		//flip a random element in our microstate
 		int rand_row = dis_row(gen);
 		int rand_col = dis_col(gen);
-		(*microstate_matrix_ptr)(rand_row, rand_col) *= -1;
+		(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
 		double deltaE = 2. * Hamiltonian::hamiltonian_periodic_ising_element(rand_row, rand_col, microstate_matrix_ptr, hamiltonian_param_ptr);
 
 		//only reject the change of Delta E > 0 with the probablity e^(-deltaE/T)
@@ -112,7 +112,7 @@ void Microstate::evolve_microstate(int iteration){
 			double boltzman_factor = exp(-(deltaE* inverseT));
 			if(random_double > boltzman_factor)
 			{
-				(*microstate_matrix_ptr)(rand_row, rand_col) *= -1;
+				(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
 			}
 		}
 
@@ -128,7 +128,7 @@ void Microstate::graph_evolve(int time, int dt) {
     double t = 0.0;
     while (t < time) {
         // Update the microstate
-        evolve_microstate(10000);
+        evolve_microstate(100);
 
         // Graph the microstate matrix
         graph_microstate_matrix();
@@ -140,14 +140,3 @@ void Microstate::graph_evolve(int time, int dt) {
 }
 
 
-int main()
-{
-	hamiltonian_param_struct hamiltonian_variables;
-	hamiltonian_variables.J = 2;
-	hamiltonian_variables.h = 0.;
-	omp_set_num_threads(16);
-	Microstate microstate = Microstate(50, 50, 0.0, &hamiltonian_variables);
-	microstate.print_microstate_matrix();
-	microstate.graph_evolve(500000, 10);
-	std::cout<<"done!";
-}

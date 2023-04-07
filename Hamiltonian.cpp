@@ -15,8 +15,8 @@
 // return the energy calculation of the nearest neighbor for a given element
 double Hamiltonian::hamiltonian_periodic_ising_element(int i, int j, Eigen::MatrixXd *microstate_matrix_ptr, hamiltonian_param_struct *hamiltonian_param)
 {
-	double const J = hamiltonian_param->J; // spin-spin interaction constant
-	double const h = hamiltonian_param->h; // magnetic field value
+	double J = hamiltonian_param->J; // spin-spin interaction constant
+	double h = hamiltonian_param->h; // magnetic field value
 
 	int const rows = microstate_matrix_ptr->rows();
 	int const cols = microstate_matrix_ptr->cols();
@@ -47,7 +47,7 @@ double Hamiltonian::hamiltonian_periodic_ising_microstate(Eigen::MatrixXd *micro
 	int const rows = microstate_matrix_ptr->rows();
 	int const cols = microstate_matrix_ptr->cols();
 
-	double microstate_energy = 0;
+	double microstate_energy = 0.;
 
 	// go through the microstate
 	// and sum the energy for each spin.
