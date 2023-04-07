@@ -82,11 +82,9 @@ double Observable::get_ising_heat_capacity(int row, int col, double T, int itera
 
 }
 
-double Observable::get_ising_entropy(int row, int col, double T, int iteration, int sample_size, hamiltonian_param_struct* hamiltonian_param_ptr)
+double Observable::get_ising_entropy(double energy, double specific_heat, double T)
 {
-	double heat_capacity = get_ising_heat_capacity(row, col, T, iteration, sample_size, hamiltonian_param_ptr);
-	double energy = get_ising_energy(row, col, T, iteration, sample_size, hamiltonian_param_ptr);
-	double entropy = energy/T + std::log(heat_capacity);
+	double heat_capacity = energy/T + std::log(specific_heat);
 	return heat_capacity;
 }
 
@@ -96,28 +94,30 @@ int main()
 	hamiltonian_param_struct hamiltonian_param;
 	hamiltonian_param.J = 2.;
 	hamiltonian_param.h = 0.0;
-	int row = 10;
-	int col = 10;
+	int row = 20;
+	int col = 20;
 	int iteration = 4000000;
-	int sample = 200;
+	int sample = iteration / 3;
 
-	std::ofstream energy_out;
-	energy_out.open("output_energy.dat");
-	std::ofstream heat_capacity_out;
-	energy_out.open("output_heat_capacity.dat");
-	std::ofstream entropy_out;
-	energy_out.open("output_entropy.dat");
-
-	for (double temp = 0.5; temp < 10.; temp += 0.25)
+	std::ofstream my_out;
+	my_out.open("output.dat");
+	my_out << "tempreature" << " " << std::setw(28) 
+		   << "E"  << std::setw(37) << " "
+		   << "Cv" << " " << std::setw(36)
+		   << "S" << std::endl;
+	for (double temp = 1.5; temp < 24.; temp += 0.1)
 	{
-		energy_out<< temp << " " << Observable::get_ising_energy(row, col, temp, iteration, sample, &hamiltonian_param) <<std::endl; 
-		heat_capacity_out<< temp << " " << Observable::get_ising_heat_capacity(row, col, temp, iteration, sample, &hamiltonian_param) <<std::endl; 
-		entropy_out<< temp << " " << Observable::get_ising_entropy(row, col, temp, iteration, sample, &hamiltonian_param) <<std::endl; 
+		double energy = Observable::get_ising_energy(row, col, temp, iteration, sample, &hamiltonian_param);
+		double cv = Observable::get_ising_heat_capacity(row, col, temp, iteration, sample, &hamiltonian_param);
+		double entropy = Observable::get_ising_entropy(energy, cv, temp); 
+		my_out <<std::scientific << std::setprecision(12)
+			  << temp/hamiltonian_param.J << std::setw(20) <<" " 
+			  << energy <<  std::setw(20) << " "
+			  << cv  << std::setw(20) << " "
+			  << entropy <<std::setw(20) << " "
+			  <<std::endl; 
 	}
 
-	energy_out.close();
-	heat_capacity_out.close();
-	entropy_out.close();
 	std::cout << "done!" << std::endl;
 	return 0;
 }
