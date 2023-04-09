@@ -15,7 +15,8 @@
 
 // defining the structure of the hamiltonian parameters.
 // In the case of Ising model, all we need is J and h.
-struct hamiltonian_param_struct{
+struct hamiltonian_param_struct
+{
 	double J;
 	double h;
 };
@@ -25,16 +26,17 @@ struct hamiltonian_param_struct{
 #include <eigen3/Eigen/src/Core/Matrix.h>
 
 // namespace definition and function prototypes
-namespace Hamiltonian{
+namespace Hamiltonian
+{
 	// Define the Hamiltonian function for a single spin in 2-D ising model
 	// This function return the interaction energy of an element at (i-1, j-1)
 	// with its neighbors with periodic boundary conditon.
-	double hamiltonian_periodic_ising_element (int i, int j, Eigen::MatrixXd* microstate_matrix_ptr, hamiltonian_param_struct* hamiltonian_param);
+	double hamiltonian_periodic_ising_element(int i, int j, Eigen::MatrixXd *microstate_matrix_ptr, hamiltonian_param_struct *hamiltonian_param);
 
-	// Define the Hamiltonian fucntion for the entire microstate of a system of sice 
+	// Define the Hamiltonian fucntion for the entire microstate of a system of sice
 	// NxM.
-	double hamiltonian_periodic_ising_microstate (Eigen::MatrixXd* microstate_matrix_ptr, hamiltonian_param_struct* hamiltonian_param);
-	
+	double hamiltonian_periodic_ising_microstate(Eigen::MatrixXd *microstate_matrix_ptr, hamiltonian_param_struct *hamiltonian_param);
+
 };
 
 #endif

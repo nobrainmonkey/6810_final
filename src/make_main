@@ -1,0 +1,27 @@
+SHELL=/bin/sh
+OBJS=Hamiltonian.o Microstate.o Observable.o main.o
+SOURCE=Hamiltonian.cpp Microstate.cpp Observable.cpp main.cpp
+HEADER= Hamiltonian.h Microstate.h Observable.h
+OUT=calculate.x
+CC= g++
+FLAGS= -g -c -Wall -O3 -fopenmp
+LFLAGS=
+
+all:$(OBJS)
+	$(CC) -g -fopenmp $(OBJS) -o ../bin/$(OUT) $(LFLAGS)
+
+Hamiltonian.o: Hamiltonian.cpp
+	$(CC) $(FLAGS) Hamiltonian.cpp
+
+Microstate.o: Microstate.cpp
+	$(CC) $(FLAGS) Microstate.cpp
+
+Observable.o: Observable.cpp
+	$(CC) $(FLAGS) Observable.cpp
+
+main.o: main.cpp
+	$(CC) $(FLAGS) main.cpp
+
+
+clean:
+	rm -f $(OBJS) $(OUT)
