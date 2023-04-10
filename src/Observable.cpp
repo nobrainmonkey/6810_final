@@ -55,7 +55,7 @@ double Observable::get_ising_energy(int row, int col, double T, int iteration, i
 		// after reaching equalibrium, we want to https://discordapp.com/channels/@me/1028655396090544259 further
 		// evolve it 1000 time and record energy for each time
 		// and take the final average.
-		int mc_steps = iteration / 3; // amount of step to take average
+		int mc_steps = iteration / 10; // amount of step to take average
 									  // get the total amount of energy over the num_average iterations of the microstate.
 		double total_energy = 0;
 		for (int i = 0; i < mc_steps; i++)
@@ -86,7 +86,7 @@ double Observable::get_ising_heat_capacity(int row, int col, double T, int itera
 		microstate_ptr->evolve_microstate_gradual(iteration); // bring system into thermal equalibrium
 		double E = 0.;
 		double Esq = 0.;
-		int mc_steps = iteration / 3; // steps after thermal equalibrium
+		int mc_steps = iteration / 10; // steps after thermal equalibrium
 		for (int i = 0; i < mc_steps; i++)
 		{
 			microstate_ptr->evolve_microstate(1);
@@ -96,7 +96,7 @@ double Observable::get_ising_heat_capacity(int row, int col, double T, int itera
 		}
 		double E_avg = E / mc_steps;
 		double Esq_avg = Esq / mc_steps;
-		double specific_heat = (Esq_avg - E_avg * E_avg) / (T * T * double(row * col) * hamiltonian_param_ptr->J);
+		double specific_heat = (Esq_avg - E_avg * E_avg) / (T * T * double(row * col) * 2.);
 		total_sample_heat_capacity += specific_heat;
 		delete microstate_ptr;
 	}
@@ -136,7 +136,7 @@ double Observable::get_ising_m(int row, int col, double T, int iteration, int sa
 		// after reaching equalibrium, we want to https://discordapp.com/channels/@me/1028655396090544259 further
 		// evolve it 1000 time and record energy for each time
 		// and take the final average.
-		int mc_steps = iteration / 3; // amount of step to take average
+		int mc_steps = iteration / 10; // amount of step to take average
 									  // get the total amount of energy over the num_average iterations of the microstate.
 		double total_m = 0;
 		for (int i = 0; i < mc_steps; i++)
@@ -161,17 +161,17 @@ double Observable::get_ising_chi(int row, int col, double T, int iteration, int 
 		microstate_ptr->evolve_microstate_gradual(iteration); // bring system into thermal equalibrium
 		double m = 0.;
 		double msq = 0.;
-		int mc_steps = iteration / 3; // steps after thermal equalibrium
+		int mc_steps = iteration / 10; // steps after thermal equalibrium
 		for (int i = 0; i < mc_steps; i++)
 		{
 			microstate_ptr->evolve_microstate(1);
-			double magnetization = microstate_ptr->get_microstate_matrix_ptr()->mean();
+			double magnetization = microstate_ptr->get_microstate_matrix_ptr()->sum();
 			m += magnetization;
 			msq += magnetization * magnetization;
 		}
 		double m_avg = m / mc_steps;
 		double msq_avg = msq / mc_steps;
-		double chi = (msq_avg - m_avg * m_avg) / (T * double(row * col) * hamiltonian_param_ptr->J);
+		double chi = (msq_avg - m_avg * m_avg) / (double(row * col)*T);
 		total_sample_chi += chi;
 		delete microstate_ptr;
 	}

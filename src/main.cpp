@@ -98,7 +98,7 @@ int main()
 		S.clear();
 		
 		omp_set_num_threads(thread);
-		int iteration = row * col * 100;
+		int iteration = row * col * 1000;
 		ofstream my_out;
 		ostringstream file_name_string;
 		file_name_string << "../data/macroscopic_" << setprecision(2) << "J=" << hamiltonian_param.J << "_"
@@ -155,7 +155,7 @@ int main()
 			std::vector<double> subCv(Cv.begin(), Cv.begin() + index);
 			double entropy = Observable::get_ising_entropy(subT, subCv);
 			S.push_back(entropy);
-			my_out << subT[index - 3]/hamiltonian_param.J << "    " << entropy << std::endl;
+			my_out << subT[index - 3]/hamiltonian_param.J << "    " << entropy/hamiltonian_param.J << std::endl;
 		}
 		my_out.close();
 

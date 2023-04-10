@@ -45,7 +45,6 @@ void Microstate::initialize_microstate_matrix(Eigen::MatrixXd *microstate_matrix
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::bernoulli_distribution dis(0.5); // discrete probablity of 0.5 for 1. This means that we also have probablity 0.5 for -1
-#pragma omp parallel for
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
@@ -111,7 +110,6 @@ void Microstate::evolve_microstate(int iteration)
 	thread_local std::uniform_int_distribution<int> dis_row(0, rows - 1);
 	thread_local std::uniform_int_distribution<int> dis_col(0, cols - 1);
 
-#pragma omp parallel for
 	for (int i = 0; i < iteration; i++)
 	{
 		// flip a random element in our microstate
@@ -149,7 +147,6 @@ void Microstate::evolve_microstate_gradual(int iteration)
 	thread_local std::uniform_int_distribution<int> dis_col(0, cols - 1);
 
 // Evolve the microstate while cooling gradually
-#pragma omp parallel for
 	for (int i = 0; i < iteration; i++)
 	{
 		// Flip a random element in our microstate
@@ -177,7 +174,6 @@ void Microstate::evolve_microstate_gradual(int iteration)
 
 	// Evolve the microstate at the target temperature for post_cooling_iteration iterations
 	inverseT = 1. / target_temp;
-#pragma omp parallel for
 	for (int i = 0; i < post_cooling_iteration; i++)
 	{
 		// Flip a random element in our microstate

@@ -4,11 +4,11 @@ SOURCE=Hamiltonian.cpp Microstate.cpp Observable.cpp main.cpp
 HEADER= Hamiltonian.h Microstate.h Observable.h
 OUT=calculate.x
 CC= g++
-FLAGS= -g -c -Wall -O3 -fopenmp
+FLAGS= -c -Wall -O3 -fopenmp -std=c++11
 LFLAGS=
 
 all:$(OBJS)
-	$(CC) -g -fopenmp $(OBJS) -o ../bin/$(OUT) $(LFLAGS)
+	$(CC) -fopenmp -O3 -std=c++11 $(OBJS) -o ../bin/$(OUT) $(LFLAGS)
 
 Hamiltonian.o: Hamiltonian.cpp
 	$(CC) $(FLAGS) Hamiltonian.cpp
