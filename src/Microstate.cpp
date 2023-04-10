@@ -141,7 +141,7 @@ void Microstate::evolve_microstate_gradual(int iteration)
 	double inverseT = 1. / start_temp;
 	double temp_step = (start_temp - target_temp) / iteration;
 	double current_temp = start_temp;
-	int post_cooling_iteration = rows * cols * 100;
+	int post_cooling_iteration = rows * cols * 100;    //number of iterations to run after target temp is reached.
 
 	// Set random distribution for row and col
 	thread_local std::mt19937 gen(std::random_device{}());

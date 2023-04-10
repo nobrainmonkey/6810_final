@@ -10,7 +10,6 @@ using namespace std;
 int main()
 {
 	int thread = 1;
-	omp_set_num_threads(thread);
 	hamiltonian_param_struct hamiltonian_param;
 	hamiltonian_param.J = 1.;
 	hamiltonian_param.h = 0.;
@@ -98,6 +97,7 @@ int main()
 		Chi.clear();
 		S.clear();
 		
+		omp_set_num_threads(thread);
 		int iteration = row * col * 100;
 		ofstream my_out;
 		ostringstream file_name_string;

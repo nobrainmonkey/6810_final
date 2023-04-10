@@ -14,7 +14,8 @@
 #include <omp.h>
 #include <iomanip>
 
-// integrating using trap rule
+// integrating using simspons rule if the number of points in x is odd
+// and when the number of points is even, this routine is back to trapozodial rule
 double integrate(std::vector<double> x, std::vector<double> y)
 {
 	int n = x.size();
@@ -67,7 +68,7 @@ double Observable::get_ising_energy(int row, int col, double T, int iteration, i
 		total_sample_energy += microstate_spin_energy;
 		delete microstate_ptr;
 	}
-	return total_sample_energy / double(sample_size);
+	return total_sample_energy / (2. * double(sample_size));
 }
 
 // return the ising heat capacity of the single spin by doing the folowing:
