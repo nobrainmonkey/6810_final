@@ -108,7 +108,7 @@ int main()
 
 		my_out << "tempreature/J"
 			   << " " << std::setw(30)
-			   << "E" << std::setw(37) << " "
+			   << "E/J" << std::setw(37) << " "
 			   << "Cv"
 			   << " " << std::setw(36)
 			   << "m"
@@ -133,7 +133,7 @@ int main()
 
 			my_out << std::scientific << std::setprecision(12)
 				   << temp / hamiltonian_param.J << std::setw(20) << " "
-				   << energy << std::setw(20) << " "
+				   << energy / hamiltonian_param.J << std::setw(20) << " "
 				   << cv << std::setw(20) << " "
 				   << m << std::setw(20) << " "
 				   << chi << std::setw(20) << " "

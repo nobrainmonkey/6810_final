@@ -34,10 +34,10 @@ double Hamiltonian::hamiltonian_periodic_ising_element(int i, int j, Eigen::Matr
 		-J * ((*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(up, j) +
 			  (*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(down, j) +
 			  (*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(i, left) +
-			  (*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(i, right)) -
-		h * (*microstate_matrix_ptr)(i, j);
+			  (*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(i, right)) 
+		-h * (*microstate_matrix_ptr)(i, j);
 
-	return element_interaction_energy;
+	return element_interaction_energy / 2.; // divide by 2 because we do not want to double coutn
 }
 
 // function definition in Hamiltonian.h

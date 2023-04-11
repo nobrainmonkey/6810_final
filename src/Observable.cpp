@@ -64,11 +64,11 @@ double Observable::get_ising_energy(int row, int col, double T, int iteration, i
 			total_energy += (Hamiltonian::hamiltonian_periodic_ising_microstate(microstate_ptr->get_microstate_matrix_ptr(), hamiltonian_param_ptr));
 		}
 		double microstate_total_energy = total_energy / double(mc_steps);
-		double microstate_spin_energy = microstate_total_energy / (hamiltonian_param_ptr->J * double((row * col)));
+		double microstate_spin_energy = microstate_total_energy / double((row * col));
 		total_sample_energy += microstate_spin_energy;
 		delete microstate_ptr;
 	}
-	return total_sample_energy / (2. * double(sample_size));
+	return total_sample_energy / (double(sample_size));
 }
 
 // return the ising heat capacity of the single spin by doing the folowing:
@@ -96,7 +96,7 @@ double Observable::get_ising_heat_capacity(int row, int col, double T, int itera
 		}
 		double E_avg = E / mc_steps;
 		double Esq_avg = Esq / mc_steps;
-		double specific_heat = (Esq_avg - E_avg * E_avg) / (T * T * double(row * col) * 2.);
+		double specific_heat = (Esq_avg - E_avg * E_avg) / (T * T * double(row * col));
 		total_sample_heat_capacity += specific_heat;
 		delete microstate_ptr;
 	}
