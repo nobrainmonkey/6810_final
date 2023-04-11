@@ -9,15 +9,15 @@
 using namespace std;
 int main()
 {
-	int thread = 1;
+	int thread = 8;
 	hamiltonian_param_struct hamiltonian_param;
 	hamiltonian_param.J = 1.;
 	hamiltonian_param.h = 0.;
-	int row = 2;
-	int col = 2;
-	int sample = 2000;
-	double Tmin = 1;
-	double Tmax = 15;
+	int row = 20;
+	int col = 20;
+	int sample = 200;
+	double Tmin = 0.5;
+	double Tmax = 6;
 	double dT = 0.1;
 	std::vector<double> T;
 	std::vector<double> Cv;
@@ -155,7 +155,7 @@ int main()
 			std::vector<double> subCv(Cv.begin(), Cv.begin() + index);
 			double entropy = Observable::get_ising_entropy(subT, subCv);
 			S.push_back(entropy);
-			my_out << subT[index - 3]/hamiltonian_param.J << "    " << entropy << std::endl;
+			my_out << subT[index]/hamiltonian_param.J << "    " << entropy << std::endl;
 		}
 		my_out.close();
 
