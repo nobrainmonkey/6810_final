@@ -155,7 +155,7 @@ int main()
 			std::vector<double> subCv(Cv.begin(), Cv.begin() + index);
 			double entropy = Observable::get_ising_entropy(subT, subCv);
 			S.push_back(entropy);
-			my_out << subT[index - 3]/hamiltonian_param.J << "    " << entropy/hamiltonian_param.J << std::endl;
+			my_out << subT[index - 3]/hamiltonian_param.J << "    " << entropy << std::endl;
 		}
 		my_out.close();
 
