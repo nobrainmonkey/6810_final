@@ -18,6 +18,7 @@ int main()
 	int sample = 200;
 	double Tmin = 0.5;
 	double Tmax = 6;
+	int iteration = row * col * 200;
 	double dT = 0.1;
 	std::vector<double> T;
 	std::vector<double> Cv;
@@ -35,13 +36,14 @@ int main()
 			cout << "\nCurrent parameters:\n";
 			cout << "[1] thread = " << thread << "\t\t";
 			cout << "[2] sample = " << sample << "\t" << endl;
-			cout << "[3] J = " << hamiltonian_param.J << "\t";
-			cout << "[4] h = " << hamiltonian_param.h << "\t" << endl;
-			cout << "[5] row = " << row << "\t";
-			cout << "[6] col = " << col << endl;
-			cout << "[7] Tmin = " << Tmin << "\t";
-			cout << "[8] Tmax = " << Tmax << "\t";
-			cout << "[9] dT = " << dT << endl;
+			cout << "[3] iterations (auto recommended) = " << iteration << "\t" << endl;
+			cout << "[4] J = " << hamiltonian_param.J << "\t";
+			cout << "[5] h = " << hamiltonian_param.h << "\t" << endl;
+			cout << "[6] row = " << row << "\t";
+			cout << "[7] col = " << col << endl;
+			cout << "[8] Tmin = " << Tmin << "\t";
+			cout << "[9] Tmax = " << Tmax << "\t";
+			cout << "[10] dT = " << dT << endl;
 			cout << "\nWhat do you want to change? [0 for none] ";
 
 			cin >> answer;
@@ -60,31 +62,37 @@ int main()
 				cin >> sample;
 				break;
 			case 3:
+				cout << " enter iteration size: ";
+				cin >> iteration;
+				break;
+			case 4:
 				cout << " enter J: ";
 				cin >> hamiltonian_param.J;
 				break;
-			case 4:
+			case 5:
 				cout << " enter h: ";
 				cin >> hamiltonian_param.h;
 				break;
-			case 5:
+			case 6:
 				cout << " enter row: ";
 				cin >> row;
-				break;
-			case 6:
-				cout << " enter col: ";
-				cin >> col;
+				iteration = row * col * 200;
 				break;
 			case 7:
+				cout << " enter col: ";
+				cin >> col;
+				iteration = row * col * 200;
+				break;
+			case 8:
 				cout << " enter Tmin: ";
 				cin >> Tmin;
 				break;
-			case 8:
+			case 9:
 				cout << " enter Tmax: ";
 				cin >> Tmax;
 				break;
 
-			case 9:
+			case 10:
 				cout << " enter Temp step ";
 				cin >> dT;
 				break;
@@ -98,7 +106,6 @@ int main()
 		S.clear();
 		
 		omp_set_num_threads(thread);
-		int iteration = row * col * 1000;
 		ofstream my_out;
 		ostringstream file_name_string;
 		file_name_string << "../data/macroscopic_" << setprecision(2) << "J=" << hamiltonian_param.J << "_"
@@ -117,6 +124,7 @@ int main()
 
 		for (double temp = Tmin; temp < Tmax; temp += dT)
 		{
+			std:: cout << "Evaluating Quantities at T = " << temp << std::endl;
 			T.push_back(temp);
 
 			double energy = Observable::get_ising_energy(row, col, temp, iteration, sample, &hamiltonian_param);
@@ -155,7 +163,7 @@ int main()
 			std::vector<double> subCv(Cv.begin(), Cv.begin() + index);
 			double entropy = Observable::get_ising_entropy(subT, subCv);
 			S.push_back(entropy);
-			my_out << subT[index]/hamiltonian_param.J << "    " << entropy << std::endl;
+			my_out << subT[index-1]/hamiltonian_param.J << "    " << entropy << std::endl;
 		}
 		my_out.close();
 
