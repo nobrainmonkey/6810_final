@@ -99,7 +99,7 @@ After we each run, a window of `gnuplot` should automatically pop up with every 
 
 Sample plot:
 
-![sample_plot](/home/xihe/6810_final/sample_plot.svg)
+![sample_plot](sample_plot.svg)
 
 System size = 10 x 10, sample size = 1000, Tmin = 0.5, Tmax= 6, dT=0.1
 
@@ -128,7 +128,7 @@ This mode gives you a terminal based visualization of how a spin system evolve u
 
 If for some reasons you cannot run this mode, here is what it looks like in real time for a 20 x 20 system:
 
- ![evolve](/home/xihe/6810_final/evolve.gif)
+ ![evolve](evolve.gif)
 
 For performance and error analysis, please refer to `/6810_final/docs`. 
 
