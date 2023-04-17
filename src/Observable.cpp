@@ -165,7 +165,7 @@ double Observable::get_ising_chi(int row, int col, double T, int iteration, int 
 		for (int i = 0; i < mc_steps; i++)
 		{
 			microstate_ptr->evolve_microstate(1);
-			double magnetization = fabs(microstate_ptr->get_microstate_matrix_ptr()->sum());
+			double magnetization = microstate_ptr->get_microstate_matrix_ptr()->sum();
 			m += magnetization;
 			msq += magnetization * magnetization;
 		}

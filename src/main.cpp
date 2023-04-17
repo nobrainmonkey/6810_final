@@ -229,8 +229,8 @@ int main()
 		ss << "set title '" << title << "'\n";
 		ss << "set xlabel '" << xlabel << "'\n";
 		ss << "set ylabel '" << ylabel << "'\n";
-		ss << "set timestamp" << "'\n";
-		ss << "set key top left" << "'\n";
+		ss << "set timestamp " << "\n";
+		ss << "set key bottom right " << "\n";
 		ss << "plot '" << file_name << "' using 1:2 with lines lw 2 title 'E(T)', \
 			'" << file_name << "' using 1:3 with lines lw 2 title 'C_v(T)', \
 			'" << entropy_name << "' using 1:2 with lines lw 2 title 'S(T)', \
