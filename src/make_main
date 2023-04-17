@@ -1,8 +1,8 @@
 SHELL=/bin/sh
 
-OBJS=Hamiltonian.o Microstate.o Observable.o GnuplotPipe.o main.o
-SOURCE=Hamiltonian.cpp Microstate.cpp Observable.cpp GnuplotPipe.cpp main.cpp
-HEADER=Hamiltonian.h Microstate.h Observable.h GnuplotPipe.h
+OBJS=Hamiltonian.o Microstate.o Observable.o main.o
+SOURCE=Hamiltonian.cpp Microstate.cpp Observable.cpp main.cpp
+HEADER=Hamiltonian.h Microstate.h Observable.h 
 EIGEN_PATH=
 OUT=calculate.x
 CC= g++
@@ -20,9 +20,6 @@ Microstate.o: Microstate.cpp
 
 Observable.o: Observable.cpp
 	$(CC) $(FLAGS) -c Observable.cpp
-
-GnuplotPipe.o: GnuplotPipe.cpp
-	$(CC) $(FLAGS) -c GnuplotPipe.cpp
 
 main.o: main.cpp
 	$(CC) $(FLAGS) -c main.cpp
