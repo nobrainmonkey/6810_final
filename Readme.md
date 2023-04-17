@@ -19,19 +19,19 @@ This project requires:
 #### Arch Linux:
 
 ```bash
-#	pacman -S eigen
+#pacman -S eigen
 ```
 
 #### Ubuntu:
 
 ```bash
-#	apt-get install libeigen3-dev
+#apt-get install libeigen3-dev
 ```
 
 #### MacOS:
 
 ```bash
-$	brew install eigen
+$brew install eigen
 ```
 
 Note: `Eigen` is a header file only library.
@@ -41,7 +41,7 @@ Note: `Eigen` is a header file only library.
 1. Clone the following GitHub repository and `cd` into the source files' location.
 
 ```bash
-$	git clone https://github.com/nobrainmonkey/6810_final && cd 6810_final/src
+$git clone https://github.com/nobrainmonkey/6810_final && cd 6810_final/src
 ```
 
 
@@ -49,7 +49,7 @@ $	git clone https://github.com/nobrainmonkey/6810_final && cd 6810_final/src
 2. Use `Gnu Make` with the makefile `make_main` to build the project.
 
 ```bash
-$	make -f make_main
+$make -f make_main
 ```
 
 The project should now be built in the directory `6810_final/bin`.
@@ -73,7 +73,7 @@ To fix this, either install `eigen` from your package manager, or do the followi
 To run the program, run the following command:
 
 ```bash
-$	./calculate.x
+$./calculate.x
 ```
 
 A CLI interface should prompt you to enter simulation values. Here are some explanation of each option. The user will input the value they want to modify with their corresponding numbered label into the terminal emulator.
