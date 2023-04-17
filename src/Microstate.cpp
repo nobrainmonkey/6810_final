@@ -198,22 +198,22 @@ void Microstate::evolve_microstate_gradual(int iteration)
 
 // graph the evolution process
 // this implementation is rather janky as I needed to use sleep to halt the program
-// The total amount of iteration this will graph is time / dt -1
-// note taht I have cleared the terminal at the very end. This command only works in *nix system
-// For windows user, you will need to change this to system("cls").
-void Microstate::graph_evolve(int time, int dt)
-{
+// time is the total time in seconds where the graph will show up
+// with a frame rate of field fps.
+void Microstate::graph_evolve(double time, int evolve_iteration, int fps)
+{    
 	double t = 0.0;
-	while (t < time)
+	int dt_in_ms = 1000. / fps ;
+	while (t < time * 1000)
 	{
 		// Update the microstate
-		evolve_microstate(100);
+		evolve_microstate(evolve_iteration);
 
 		// Graph the microstate matrix
 		graph_microstate_matrix();
 		// Wait for some time
-		std::this_thread::sleep_for(std::chrono::milliseconds(dt));
-		t += dt;
+		std::this_thread::sleep_for(std::chrono::milliseconds(dt_in_ms));
+		t += dt_in_ms;
 		system("clear");
 	}
 }

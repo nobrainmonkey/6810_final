@@ -1,10 +1,24 @@
+// Filename: main.cpp
+// main routine for running a ising model MCMC chain 
+//
+// Author: Xihe Han
+//
+// Changelog:
+//	4/3/2023 - initial commit
+//	4/7/2023 - added cli menu
+//	4/8/2023 - added entropy calculation 
+//	4/16/2023 - added microstate grahing mode and gnuplot pipe.
+//
+//////////////////////////////////////////////////////////////////////////
+
 #include "Observable.h"
+#include "GnuplotPipe.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <omp.h>
 #include <string>
 #include <sstream>
+#include <cstdio>
 
 using namespace std;
 int main()
@@ -12,14 +26,21 @@ int main()
 	int thread = 8;
 	hamiltonian_param_struct hamiltonian_param;
 	hamiltonian_param.J = 1.;
-	hamiltonian_param.h = 0.;
+	hamiltonian_param.h = 0.01;
+	hamiltonian_param_struct* hamiltonian_param_ptr = &hamiltonian_param;
 	int row = 20;
 	int col = 20;
 	int sample = 200;
 	double Tmin = 0.5;
 	double Tmax = 6;
-	int iteration = row * col * 200;
 	double dT = 0.1;
+	int iteration = row * col * 1000;
+
+	double graph_T = 0;
+	double graph_time = 0;
+	int graph_iteration_skip  = 0;
+	int graphing_fps = 10;
+
 	std::vector<double> T;
 	std::vector<double> Cv;
 	std::vector<double> E;
@@ -33,18 +54,26 @@ int main()
 		answer = 1;
 		while (answer != 0)
 		{
-			cout << "\nCurrent parameters:\n";
+			cout << "\nCurrent Calculation Parameters:\n";
 			cout << "[1] thread = " << thread << "\t\t";
 			cout << "[2] sample = " << sample << "\t" << endl;
 			cout << "[3] iterations (auto recommended) = " << iteration << "\t" << endl;
 			cout << "[4] J = " << hamiltonian_param.J << "\t";
-			cout << "[5] h = " << hamiltonian_param.h << "\t" << endl;
+			cout << "[5] h = " << hamiltonian_param.h << "\t \t" << endl;
 			cout << "[6] row = " << row << "\t";
 			cout << "[7] col = " << col << endl;
 			cout << "[8] Tmin = " << Tmin << "\t";
 			cout << "[9] Tmax = " << Tmax << "\t";
 			cout << "[10] dT = " << dT << endl;
-			cout << "\nWhat do you want to change? [0 for none] ";
+			cout << "______________________________________"<<endl;
+			cout << "Current Graphing Mode Parameters:"<<endl;
+			cout << "Parameters cow and rol number are inherented from above:"<<endl;
+			cout << "[11] graphing Tempreature = " << graph_T <<"\t";
+			cout << "[12] graphing time = " << graph_time <<"\t";
+			cout << "[13] graphing iteration per frame = " << graph_iteration_skip << "\t" << endl;
+			cout << "[14] graphing fps = " << graphing_fps << "\t \t" << endl;
+			cout << "[15] start graphing!" << endl;
+			cout << "What do you want to change? [0 for none] ";
 
 			cin >> answer;
 			cout << endl;
@@ -76,12 +105,12 @@ int main()
 			case 6:
 				cout << " enter row: ";
 				cin >> row;
-				iteration = row * col * 200;
+				iteration = row * col * 1000;
 				break;
 			case 7:
 				cout << " enter col: ";
 				cin >> col;
-				iteration = row * col * 200;
+				iteration = row * col * 1000;
 				break;
 			case 8:
 				cout << " enter Tmin: ";
@@ -95,6 +124,29 @@ int main()
 			case 10:
 				cout << " enter Temp step ";
 				cin >> dT;
+				break;
+			case 11:
+				cout << " enter graphing temp ";
+				cin >> graph_T;
+				break;
+			case 12:
+				cout << " enter graphing time ";
+				cin >> graph_time;
+				break;
+			case 13:
+				cout << " enter graphing iteration per frame ";
+				cin >> graph_iteration_skip;
+				break;
+			case 14:
+				cout << " enter graphing fps ";
+				cin >> graphing_fps;
+				break;
+			case 15:
+				cout << " enter to start graphing";
+				Microstate *microstate_ptr = new Microstate(row, col, graph_T, hamiltonian_param_ptr);
+				microstate_ptr->tempreature = graph_T;
+				microstate_ptr->graph_evolve(graph_time, graph_iteration_skip, graphing_fps);
+				delete microstate_ptr;
 				break;
 			}
 		}
@@ -159,13 +211,37 @@ int main()
 
 		for (int index = 3; index < T_mesh_size; index++)
 		{
-			std::vector<double> subT(T.begin(), T.begin() + index);
-			std::vector<double> subCv(Cv.begin(), Cv.begin() + index);
+			std::vector<double> subT(T.begin(), T.begin() + index+1);
+			std::vector<double> subCv(Cv.begin(), Cv.begin() + index+1);
 			double entropy = Observable::get_ising_entropy(subT, subCv);
 			S.push_back(entropy);
-			my_out << subT[index-1]/hamiltonian_param.J << "    " << entropy << std::endl;
+			my_out << subT[index]/hamiltonian_param.J << "    " << entropy << std::endl;
 		}
 		my_out.close();
+
+
+		string title = "Macroscopic Quantities";
+		string xlabel = "T/k_BJ";
+		string ylabel = "J scale";
+
+		stringstream plot_ss;
+		stringstream ss;
+		ss << "set title '" << title << "'\n";
+		ss << "set xlabel '" << xlabel << "'\n";
+		ss << "set ylabel '" << ylabel << "'\n";
+		ss << "set timestamp" << "'\n";
+		ss << "set key top left" << "'\n";
+		ss << "plot '" << file_name << "' using 1:2 with lines lw 2 title 'E(T)', \
+			'" << file_name << "' using 1:3 with lines lw 2 title 'C_v(T)', \
+			'" << entropy_name << "' using 1:2 with lines lw 2 title 'S(T)', \
+			'" << file_name << "' using 1:4 with lines lw 2 title 'm(T)', \
+			'" << file_name << "' using 1:5 with lines lw 2 title 'chi(T)'\n";
+		string plotcmd = ss.str();
+		// plot data using gnuplot
+		FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
+		fprintf(gnuplotPipe, "%s", plotcmd.c_str());
+		fflush(gnuplotPipe);
+		pclose(gnuplotPipe);
 
 		cout << "Again? (no=0, clear=1) ";
 		cin >> answer2;

@@ -42,7 +42,7 @@ public:
 	void graph_microstate_matrix();
 
 	// graph the evolution of the microstat matrix
-	void graph_evolve(int time, int dt);
+	void graph_evolve(double time, int evolve_iteration, int fps);
 
 	// evolve the microstate using MCMC seleciton rule:
 	void evolve_microstate(int iteration);

@@ -1,26 +1,31 @@
 SHELL=/bin/sh
-OBJS=Hamiltonian.o Microstate.o Observable.o main.o
-SOURCE=Hamiltonian.cpp Microstate.cpp Observable.cpp main.cpp
-HEADER= Hamiltonian.h Microstate.h Observable.h
+
+OBJS=Hamiltonian.o Microstate.o Observable.o GnuplotPipe.o main.o
+SOURCE=Hamiltonian.cpp Microstate.cpp Observable.cpp GnuplotPipe.cpp main.cpp
+HEADER=Hamiltonian.h Microstate.h Observable.h GnuplotPipe.h
+EIGEN_PATH=
 OUT=calculate.x
 CC= g++
-FLAGS= -c -Wall -O3 -fopenmp -std=c++11
-LFLAGS=
+FLAGS= -Wall -O3 -fopenmp -std=c++11
+LFLAGS= 
 
 all:$(OBJS)
-	$(CC) -fopenmp -O3 -std=c++11 $(OBJS) -o ../bin/$(OUT) $(LFLAGS)
+	$(CC) $(FLAGS) $(OBJS) -o ../bin/$(OUT) $(LFLAGS)
 
 Hamiltonian.o: Hamiltonian.cpp
-	$(CC) $(FLAGS) Hamiltonian.cpp
+	$(CC) $(FLAGS) -c Hamiltonian.cpp
 
 Microstate.o: Microstate.cpp
-	$(CC) $(FLAGS) Microstate.cpp
+	$(CC) $(FLAGS) -c Microstate.cpp
 
 Observable.o: Observable.cpp
-	$(CC) $(FLAGS) Observable.cpp
+	$(CC) $(FLAGS) -c Observable.cpp
+
+GnuplotPipe.o: GnuplotPipe.cpp
+	$(CC) $(FLAGS) -c GnuplotPipe.cpp
 
 main.o: main.cpp
-	$(CC) $(FLAGS) main.cpp
+	$(CC) $(FLAGS) -c main.cpp
 
 
 clean:
