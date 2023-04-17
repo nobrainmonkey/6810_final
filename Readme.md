@@ -1,1 +1,7 @@
-This is Xihe's final project for physics 6810 at OSU.
+# 2-D Ising Model Simulation 
+
+## Dependencies
+
+Building this project requires:
+
+1. (Eigen)[https://eigen.tuxfamily.org/index.php?title=Main_Page]
