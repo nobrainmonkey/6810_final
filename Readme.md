@@ -18,19 +18,19 @@ This project requires:
 
 #### Arch Linux:
 
-```bash
+```shell
 # pacman -S eigen
 ```
 
 #### Ubuntu:
 
-```bash
+```shell
 # apt-get install libeigen3-dev
 ```
 
 #### MacOS:
 
-```bash
+```shell
 $ brew install eigen
 ```
 
@@ -40,7 +40,7 @@ Note: `Eigen` is a header file only library.
 
 1. Clone the following GitHub repository and `cd` into the source files' location.
 
-```bash
+```shell
 $ git clone https://github.com/nobrainmonkey/6810_final && cd 6810_final/src
 ```
 
@@ -48,7 +48,7 @@ $ git clone https://github.com/nobrainmonkey/6810_final && cd 6810_final/src
 
 2. Use `Gnu Make` with the makefile `make_main` to build the project.
 
-```bash
+```shell
 $ make -f make_main
 ```
 
@@ -72,7 +72,7 @@ To fix this, either install `eigen` from your package manager, or do the followi
 
 To run the program, run the following command:
 
-```bash
+```shell
 $ ./calculate.x
 ```
 
