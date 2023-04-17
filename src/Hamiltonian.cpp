@@ -12,7 +12,7 @@
 #include "Hamiltonian.h"
 
 // function definition in Hamiltonian.h
-// return the energy calculation of the nearest neighbor for a given element
+// return the energy calculation of the nearest neightbor interaction of a spin located at (i,j)
 double Hamiltonian::hamiltonian_periodic_ising_element(int i, int j, Eigen::MatrixXd *microstate_matrix_ptr, hamiltonian_param_struct *hamiltonian_param)
 {
 	double J = hamiltonian_param->J; // spin-spin interaction constant
@@ -32,9 +32,9 @@ double Hamiltonian::hamiltonian_periodic_ising_element(int i, int j, Eigen::Matr
 	// this equation comes from the hamiltonian of ising model
 	double element_interaction_energy =
 		-J * ((*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(up, j) +
-			  (*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(down, j) +
-			  (*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(i, left) +
-			  (*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(i, right)) 
+				(*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(down, j) +
+				(*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(i, left) +
+				(*microstate_matrix_ptr)(i, j) * (*microstate_matrix_ptr)(i, right)) 
 		-h * (*microstate_matrix_ptr)(i, j);
 
 	return element_interaction_energy; 

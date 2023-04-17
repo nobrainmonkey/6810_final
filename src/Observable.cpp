@@ -6,6 +6,9 @@
 //
 // Version history:
 //	04/06/2023: original version
+//	04/10/2023: Added integration routine 
+//	04/13/2023: Added Cv, chi calculation
+//	04/17/2023: fixed prefactors
 //
 //**************************************************************
 
@@ -36,7 +39,7 @@ double integrate(std::vector<double> x, std::vector<double> y)
 // 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equalibrium
 // 2. keep evolving the microstate for `mc_steps` amount of time, record the energy for each evolution, and average the energy
 // 3. return to step one for `sample_size` amount of time, record the averaged energy each time, and finally average all the samples
-// 4. return the total sample energy per spin in the unit of J.
+// 4. return the total sample energy per spin.
 double Observable::get_ising_energy(int row, int col, double T, int iteration, int sample_size, hamiltonian_param_struct *hamiltonian_param_ptr)
 {
 	double total_sample_energy = 0.;
@@ -56,7 +59,7 @@ double Observable::get_ising_energy(int row, int col, double T, int iteration, i
 		// evolve it 1000 time and record energy for each time
 		// and take the final average.
 		int mc_steps = iteration / 10; // amount of step to take average
-									  // get the total amount of energy over the num_average iterations of the microstate.
+									   // get the total amount of energy over the num_average iterations of the microstate.
 		double total_energy = 0;
 		for (int i = 0; i < mc_steps; i++)
 		{
@@ -73,9 +76,9 @@ double Observable::get_ising_energy(int row, int col, double T, int iteration, i
 
 // return the ising heat capacity of the single spin by doing the folowing:
 // 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equalibrium
-// 2. keep evolving the microstate for `mc_steps` amount of time, record the energy for each evolution, and use Cv = (<E^2> - <E>^2)/T to calcualte C_v
+// 2. keep evolving the microstate for `mc_steps` amount of time, record the energy for each evolution, and use Cv = (<E^2> - <E>^2)/T^2 to calcualte C_v
 // 3. return to step one for `sample_size` amount of time, record the averaged energy each time, calculate Cv, and finally average all the samples
-// 4. return the total sample specific heat per spin in the unit of J.
+// 4. return the total sample specific heat per spin.
 double Observable::get_ising_heat_capacity(int row, int col, double T, int iteration, int sample_size, hamiltonian_param_struct *hamiltonian_param_ptr)
 {
 	double total_sample_heat_capacity = 0;
@@ -94,6 +97,7 @@ double Observable::get_ising_heat_capacity(int row, int col, double T, int itera
 			E += energy;
 			Esq += energy * energy;
 		}
+		// averaging over the mc_steps, which is 1/10th of the iteration number (last ten percent)
 		double E_avg = E / mc_steps;
 		double Esq_avg = Esq / mc_steps;
 		double specific_heat = (Esq_avg - E_avg * E_avg) / (T * T * double(row * col));
@@ -103,8 +107,8 @@ double Observable::get_ising_heat_capacity(int row, int col, double T, int itera
 	return total_sample_heat_capacity / (double)sample_size;
 }
 
-// return the ising entropy per particle per J of the single spin by using the equation
-// S = U/T + ln(Cv). Note the user should use the respective method to calculate E and Cv.
+// Reutrn the entropy of a microstate by dong the intergral
+// S(T) = int_{0} ^{T} C_v / T dT
 double Observable::get_ising_entropy(std::vector<double> T, std::vector<double> Cv)
 {
 	int size = T.size();
@@ -118,6 +122,11 @@ double Observable::get_ising_entropy(std::vector<double> T, std::vector<double> 
 	return entropy;
 }
 
+// return the ising magnetization of the single spin by doing the folowing:
+// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equalibrium
+// 2. keep evolving the microstate for `mc_steps` amount of time, record the magnetization for each evolution, and average the magnetization
+// 3. return to step one for `sample_size` amount of time, record the averaged magnetization each time, and finally average all the samples
+// 4. return the total sample magnetization per spin.
 double Observable::get_ising_m(int row, int col, double T, int iteration, int sample_size, hamiltonian_param_struct *hamiltonian_param_ptr)
 {
 	double total_sample_m = 0.;
@@ -137,7 +146,7 @@ double Observable::get_ising_m(int row, int col, double T, int iteration, int sa
 		// evolve it 1000 time and record energy for each time
 		// and take the final average.
 		int mc_steps = iteration / 10; // amount of step to take average
-									  // get the total amount of energy over the num_average iterations of the microstate.
+									   // get the total amount of energy over the num_average iterations of the microstate.
 		double total_m = 0;
 		for (int i = 0; i < mc_steps; i++)
 		{
@@ -151,6 +160,11 @@ double Observable::get_ising_m(int row, int col, double T, int iteration, int sa
 	return total_sample_m / double(sample_size);
 }
 
+// return the ising chi of the single spin by doing the folowing:
+// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equalibrium
+// 2. keep evolving the microstate for `mc_steps` amount of time, record the energy for each evolution, and use Chi = (<M^2> - <M>^2)/T to calcualte Chi
+// 3. return to step one for `sample_size` amount of time, record the averaged magnetization each time, calculate Chi, and finally average all the samples
+// 4. return the total Chi per spin.
 double Observable::get_ising_chi(int row, int col, double T, int iteration, int sample_size, hamiltonian_param_struct *hamiltonian_param_ptr)
 {
 	double total_sample_chi = 0;
@@ -169,8 +183,10 @@ double Observable::get_ising_chi(int row, int col, double T, int iteration, int 
 			m += magnetization;
 			msq += magnetization * magnetization;
 		}
+		// calculate averaged magnetication
 		double m_avg = m / mc_steps;
 		double msq_avg = msq / mc_steps;
+		// calculate chi per spin
 		double chi = (msq_avg - m_avg * m_avg) / (double(row * col)*T);
 		total_sample_chi += chi;
 		delete microstate_ptr;

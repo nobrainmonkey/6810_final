@@ -6,7 +6,13 @@
 //
 // Revision History:
 //  04/05/2023 origional version
+//  04/10/2023 added gradual thermalize method
+//  04/13/2023 fixed some pre-factors
+//  04/17/2023 changed the parameters of graph_evolve
+//				to be more readable
 //
+//	TODO: Precalcualte the Boltzmann factors
+//        to reduce computation time.
 //***********************************
 
 // include files
@@ -100,8 +106,8 @@ void Microstate::graph_microstate_matrix()
 	}
 }
 
-// code to evolve the microstate with given iteration using single step monte carlo markov chain
-// openmp should be implemented here
+// routine to perform the Matropolis algorithm on a microstate.
+// this routines only update a current microstate
 void Microstate::evolve_microstate(int iteration)
 {
 	double inverseT = 1. / tempreature;
@@ -115,7 +121,10 @@ void Microstate::evolve_microstate(int iteration)
 		// flip a random element in our microstate
 		int rand_row = dis_row(gen);
 		int rand_col = dis_col(gen);
+		// we assume to flip the spin at the random location
 		(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
+		// delta E is just 2 times the flipped energy.
+		// doing it this way so we dont need to calculate delta E by going through the entire matrix
 		double deltaE = 2. * Hamiltonian::hamiltonian_periodic_ising_element(rand_row, rand_col, microstate_matrix_ptr, hamiltonian_param_ptr);
 
 		// only reject the change of Delta E > 0 with the probablity e^(-deltaE/T)
@@ -132,12 +141,14 @@ void Microstate::evolve_microstate(int iteration)
 	}
 }
 
+// routine to evolve the microstate gradually from 5* target temperature
+// this routine should always be used when termalizing the microstate
 void Microstate::evolve_microstate_gradual(int iteration)
 {
-	double start_temp = 5 * tempreature;
+	double start_temp = 5 * tempreature; 
 	double target_temp = tempreature;
 	double inverseT = 1. / start_temp;
-	double temp_step = (start_temp - target_temp) / iteration;
+	double temp_step = (start_temp - target_temp) / iteration; //calculate the step of temperature given iteration 
 	double current_temp = start_temp;
 	int post_cooling_iteration = rows * cols * 100;    //number of iterations to run after target temp is reached.
 
@@ -146,7 +157,7 @@ void Microstate::evolve_microstate_gradual(int iteration)
 	thread_local std::uniform_int_distribution<int> dis_row(0, rows - 1);
 	thread_local std::uniform_int_distribution<int> dis_col(0, cols - 1);
 
-// Evolve the microstate while cooling gradually
+	// Evolve the microstate while cooling gradually
 	for (int i = 0; i < iteration; i++)
 	{
 		// Flip a random element in our microstate

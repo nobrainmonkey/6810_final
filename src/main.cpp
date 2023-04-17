@@ -12,7 +12,6 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "Observable.h"
-#include "GnuplotPipe.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -23,24 +22,27 @@
 using namespace std;
 int main()
 {
-	int thread = 8;
+	// initialize values 
+	int thread = 8; // threads to use
 	hamiltonian_param_struct hamiltonian_param;
 	hamiltonian_param.J = 1.;
 	hamiltonian_param.h = 0.01;
 	hamiltonian_param_struct* hamiltonian_param_ptr = &hamiltonian_param;
-	int row = 20;
-	int col = 20;
-	int sample = 200;
-	double Tmin = 0.5;
-	double Tmax = 6;
+	int row = 4;
+	int col = 4;
+	int sample = 1000;
+	double Tmin = 0.5; //min temperature for evaluation 
+	double Tmax = 6; //max temperature for evaluation 
 	double dT = 0.1;
 	int iteration = row * col * 1000;
 
+	// initial graphing parameters
 	double graph_T = 0;
 	double graph_time = 0;
 	int graph_iteration_skip  = 0;
 	int graphing_fps = 10;
 
+	// 	initialize calculated values' vectors 
 	std::vector<double> T;
 	std::vector<double> Cv;
 	std::vector<double> E;
@@ -48,7 +50,10 @@ int main()
 	std::vector<double> Chi;
 	std::vector<double> S;
 
+	// answer to break out of the cli interfac
 	int answer = 1, answer2 = 1;
+
+	// the cli interface 
 	while (answer2 != 0)
 	{
 		answer = 1;
@@ -80,100 +85,105 @@ int main()
 
 			switch (answer)
 			{
-			case 0:
-				break;
-			case 1:
-				cout << " enter thread: ";
-				cin >> thread;
-				break;
-			case 2:
-				cout << " enter sample size: ";
-				cin >> sample;
-				break;
-			case 3:
-				cout << " enter iteration size: ";
-				cin >> iteration;
-				break;
-			case 4:
-				cout << " enter J: ";
-				cin >> hamiltonian_param.J;
-				break;
-			case 5:
-				cout << " enter h: ";
-				cin >> hamiltonian_param.h;
-				break;
-			case 6:
-				cout << " enter row: ";
-				cin >> row;
-				iteration = row * col * 1000;
-				break;
-			case 7:
-				cout << " enter col: ";
-				cin >> col;
-				iteration = row * col * 1000;
-				break;
-			case 8:
-				cout << " enter Tmin: ";
-				cin >> Tmin;
-				break;
-			case 9:
-				cout << " enter Tmax: ";
-				cin >> Tmax;
-				break;
+				case 0:
+					break;
+				case 1:
+					cout << " enter thread: ";
+					cin >> thread;
+					break;
+				case 2:
+					cout << " enter sample size: ";
+					cin >> sample;
+					break;
+				case 3:
+					cout << " enter iteration size: ";
+					cin >> iteration;
+					break;
+				case 4:
+					cout << " enter J: ";
+					cin >> hamiltonian_param.J;
+					break;
+				case 5:
+					cout << " enter h: ";
+					cin >> hamiltonian_param.h;
+					break;
+				case 6:
+					cout << " enter row: ";
+					cin >> row;
+					iteration = row * col * 1000;
+					break;
+				case 7:
+					cout << " enter col: ";
+					cin >> col;
+					iteration = row * col * 1000;
+					break;
+				case 8:
+					cout << " enter Tmin: ";
+					cin >> Tmin;
+					break;
+				case 9:
+					cout << " enter Tmax: ";
+					cin >> Tmax;
+					break;
 
-			case 10:
-				cout << " enter Temp step ";
-				cin >> dT;
-				break;
-			case 11:
-				cout << " enter graphing temp ";
-				cin >> graph_T;
-				break;
-			case 12:
-				cout << " enter graphing time ";
-				cin >> graph_time;
-				break;
-			case 13:
-				cout << " enter graphing iteration per frame ";
-				cin >> graph_iteration_skip;
-				break;
-			case 14:
-				cout << " enter graphing fps ";
-				cin >> graphing_fps;
-				break;
-			case 15:
-				cout << " enter to start graphing";
-				Microstate *microstate_ptr = new Microstate(row, col, graph_T, hamiltonian_param_ptr);
-				microstate_ptr->tempreature = graph_T;
-				microstate_ptr->graph_evolve(graph_time, graph_iteration_skip, graphing_fps);
-				delete microstate_ptr;
-				break;
+				case 10:
+					cout << " enter Temp step ";
+					cin >> dT;
+					break;
+				case 11:
+					cout << " enter graphing temp ";
+					cin >> graph_T;
+					break;
+				case 12:
+					cout << " enter graphing time ";
+					cin >> graph_time;
+					break;
+				case 13:
+					cout << " enter graphing iteration per frame ";
+					cin >> graph_iteration_skip;
+					break;
+				case 14:
+					cout << " enter graphing fps ";
+					cin >> graphing_fps;
+					break;
+				case 15:
+					cout << " enter to start graphing";
+					Microstate *microstate_ptr = new Microstate(row, col, graph_T, hamiltonian_param_ptr);
+					microstate_ptr->tempreature = graph_T;
+					microstate_ptr->graph_evolve(graph_time, graph_iteration_skip, graphing_fps);
+					delete microstate_ptr;
+					break;
 			}
 		}
+
+		// clearing calculated values each run
 		T.clear();
 		E.clear();
 		Cv.clear();
 		Mag.clear();
 		Chi.clear();
 		S.clear();
-		
-		omp_set_num_threads(thread);
+
+		omp_set_num_threads(thread); // set number of threads to use 
+
+		// output stream for calculated data
 		ofstream my_out;
 		ostringstream file_name_string;
 		file_name_string << "../data/macroscopic_" << setprecision(2) << "J=" << hamiltonian_param.J << "_"
-						 << "h=" << hamiltonian_param.h << ".dat";
+			<< "h=" << hamiltonian_param.h << ".dat";
 		string file_name = file_name_string.str();
 		my_out.open(file_name.c_str(), ofstream::trunc);
 
 		my_out << "tempreature/J"
-			   << " " << std::setw(30)
-			   << "E/J" << std::setw(37) << " "
-			   << "Cv"
-			   << " " << std::setw(36)
-			   << "m"
-			   << " " << std::setw(36)
-			   << "chi" << std::endl;
+			<< " " << std::setw(30)
+			<< "E/J" << std::setw(37) << " "
+			<< "Cv"
+			<< " " << std::setw(36)
+			<< "m"
+			<< " " << std::setw(36)
+			<< "chi" << std::endl;
 
+		// stepping through temperatures and gather macrosopic quantities at each temperature.
 		for (double temp = Tmin; temp < Tmax; temp += dT)
 		{
 			std:: cout << "Evaluating Quantities at T = " << temp << std::endl;
@@ -192,24 +202,25 @@ int main()
 			Chi.push_back(chi);
 
 			my_out << std::scientific << std::setprecision(12)
-				   << temp / hamiltonian_param.J << std::setw(20) << " "
-				   << energy / hamiltonian_param.J << std::setw(20) << " "
-				   << cv << std::setw(20) << " "
-				   << m << std::setw(20) << " "
-				   << chi << std::setw(20) << " "
-				   << std::endl;
+				<< temp / hamiltonian_param.J << std::setw(20) << " "
+				<< energy / hamiltonian_param.J << std::setw(20) << " "
+				<< cv << std::setw(20) << " "
+				<< m << std::setw(20) << " "
+				<< chi << std::setw(20) << " "
+				<< std::endl;
 		}
 		my_out.close();
 
+		// calculate the entropy with the calculated value of Cv
 		ostringstream entropy_name_string;
 		entropy_name_string << "../data/entropy_" << setprecision(2) << "J=" << hamiltonian_param.J << "_"
-							<< "h=" << hamiltonian_param.h << ".dat";
+			<< "h=" << hamiltonian_param.h << ".dat";
 		string entropy_name = entropy_name_string.str();
 		my_out.open(entropy_name.c_str(), ofstream::trunc);
 
 		int T_mesh_size = T.size();
 
-		for (int index = 3; index < T_mesh_size; index++)
+		for (int index = 3; index < T_mesh_size; index++) // we start from 3 in order for simpson's rule to work.
 		{
 			std::vector<double> subT(T.begin(), T.begin() + index+1);
 			std::vector<double> subCv(Cv.begin(), Cv.begin() + index+1);
@@ -219,7 +230,7 @@ int main()
 		}
 		my_out.close();
 
-
+		// Creating commands for gnuplot pipe.
 		string title = "Macroscopic Quantities";
 		string xlabel = "T/k_BJ";
 		string ylabel = "J scale";
@@ -237,7 +248,8 @@ int main()
 			'" << file_name << "' using 1:4 with lines lw 2 title 'm(T)', \
 			'" << file_name << "' using 1:5 with lines lw 2 title 'chi(T)'\n";
 		string plotcmd = ss.str();
-		// plot data using gnuplot
+
+		// piping gnuplot command into gnuplot using popen
 		FILE *gnuplotPipe = popen("gnuplot -persistent", "w");
 		fprintf(gnuplotPipe, "%s", plotcmd.c_str());
 		fflush(gnuplotPipe);
