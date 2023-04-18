@@ -26,6 +26,10 @@
 #include <chrono>
 #include <thread>
 
+// declearing random number generator using mt19937
+std::mt19937 rng(std::random_device{}());
+std::mt19937 gen(rng);
+
 // construtor
 Microstate::Microstate(int row, int col, double temp, hamiltonian_param_struct *hamiltonian_param)
 {
@@ -48,8 +52,6 @@ Microstate::~Microstate()
 // with each element randomly assigned as -1. or 1.
 void Microstate::initialize_microstate_matrix(Eigen::MatrixXd *microstate_matrix_ptr)
 {
-	std::random_device rd;
-	std::mt19937 gen(rd());
 	std::bernoulli_distribution dis(0.5); // discrete probablity of 0.5 for 1. This means that we also have probablity 0.5 for -1
 	for (int i = 0; i < rows; i++)
 	{
@@ -112,7 +114,6 @@ void Microstate::evolve_microstate(int iteration)
 {
 	double inverseT = 1. / tempreature;
 	// set random distrubution for row and col
-	thread_local std::mt19937 gen(std::random_device{}());
 	thread_local std::uniform_int_distribution<int> dis_row(0, rows - 1);
 	thread_local std::uniform_int_distribution<int> dis_col(0, cols - 1);
 
@@ -153,7 +154,6 @@ void Microstate::evolve_microstate_gradual(int iteration)
 	int post_cooling_iteration = rows * cols * 100;    //number of iterations to run after target temp is reached.
 
 	// Set random distribution for row and col
-	thread_local std::mt19937 gen(std::random_device{}());
 	thread_local std::uniform_int_distribution<int> dis_row(0, rows - 1);
 	thread_local std::uniform_int_distribution<int> dis_col(0, cols - 1);
 
