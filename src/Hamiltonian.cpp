@@ -5,14 +5,14 @@
 // Programmer: Xihe Han
 //
 // Revision history:
-//	04/05/2023 Origional version
+//	04/05/2023 Origianal version
 //*****************************************************
 
 // include files
 #include "Hamiltonian.h"
 
 // function definition in Hamiltonian.h
-// return the energy calculation of the nearest neightbor interaction of a spin located at (i,j)
+// return the energy calculation of the nearest neighbor interaction of a spin located at (i,j)
 double Hamiltonian::hamiltonian_periodic_ising_element(int i, int j, Eigen::MatrixXd *microstate_matrix_ptr, hamiltonian_param_struct *hamiltonian_param)
 {
 	double J = hamiltonian_param->J; // spin-spin interaction constant

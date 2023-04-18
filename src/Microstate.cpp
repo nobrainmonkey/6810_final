@@ -5,13 +5,13 @@
 // Programmer: Xihe Han
 //
 // Revision History:
-//  04/05/2023 origional version
+//  04/05/2023 original version
 //  04/10/2023 added gradual thermalize method
 //  04/13/2023 fixed some pre-factors
 //  04/17/2023 changed the parameters of graph_evolve
 //				to be more readable
 //
-//	TODO: Precalcualte the Boltzmann factors
+//	TODO: Pre-calculate the Boltzmann factors
 //        to reduce computation time.
 //***********************************
 
@@ -26,19 +26,45 @@
 #include <chrono>
 #include <thread>
 
+//***************************************************************************************************************************************
+//**********************************************************RNG routines*****************************************************************
+//***************************************************************************************************************************************
+
 // declearing random number generator using mt19937
-std::mt19937 rng(std::random_device{}());
-std::mt19937 gen(rng);
+std::mt19937 global_rng(std::random_device{}());
+
+// generate a random integer between 0 and N-1
+int random_integer(int N){
+	thread_local std::uniform_int_distribution<int> dist(0, N-1);
+	return dist(global_rng);
+}
+
+// generate a random double between 0 and 1
+double random_unitary_double(){
+	thread_local std::uniform_real_distribution<double> dist(0, 1);
+	return dist(global_rng);
+}
+
+int random_sign(){
+	thread_local std::uniform_int_distribution<int> dist(0, 1);
+	int sign = dist(global_rng) * 2 - 1;
+	return double(sign);
+}
+
+//***************************************************************************************************************************************
+//******************************************************Class Initialization*************************************************************
+//***************************************************************************************************************************************
 
 // construtor
 Microstate::Microstate(int row, int col, double temp, hamiltonian_param_struct *hamiltonian_param)
 {
-	tempreature = temp;
+	temperature = temp;
 	rows = row;
 	cols = col;
 	microstate_matrix_ptr = new Eigen::MatrixXd(rows, cols);
 	initialize_microstate_matrix(microstate_matrix_ptr);
 	hamiltonian_param_ptr = hamiltonian_param;
+
 }
 
 // destructpr
@@ -52,12 +78,11 @@ Microstate::~Microstate()
 // with each element randomly assigned as -1. or 1.
 void Microstate::initialize_microstate_matrix(Eigen::MatrixXd *microstate_matrix_ptr)
 {
-	std::bernoulli_distribution dis(0.5); // discrete probablity of 0.5 for 1. This means that we also have probablity 0.5 for -1
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
 		{
-			(*microstate_matrix_ptr)(i, j) = dis(gen) ? double(1.) : double(-1.); // shorthand for if-else statement
+			(*microstate_matrix_ptr)(i, j) = double(random_sign()); // fill the matrix with random 1 or -1
 		}
 	}
 }
@@ -67,6 +92,10 @@ Eigen::MatrixXd *Microstate::get_microstate_matrix_ptr()
 {
 	return microstate_matrix_ptr;
 }
+
+//***************************************************************************************************************************************
+//******************************************************Graphing and Printing************************************************************
+//***************************************************************************************************************************************
 
 // print the microstate matrix
 void Microstate::print_microstate_matrix()
@@ -91,9 +120,11 @@ void Microstate::print_microstate_matrix()
 void Microstate::graph_microstate_matrix()
 {
 	std::cout << "Microstate Matrix:" << std::endl;
-	for (int j = 0; j < cols; j++)
+	int col = cols;
+	int row = rows;
+	for (int j = 0; j < col; j++)
 	{
-		for (int i = 0; i < rows; i++)
+		for (int i = 0; i < row; i++)
 		{
 			if ((*microstate_matrix_ptr)(i, j) == -1.)
 			{
@@ -108,109 +139,11 @@ void Microstate::graph_microstate_matrix()
 	}
 }
 
-// routine to perform the Matropolis algorithm on a microstate.
-// this routines only update a current microstate
-void Microstate::evolve_microstate(int iteration)
-{
-	double inverseT = 1. / tempreature;
-	// set random distrubution for row and col
-	thread_local std::uniform_int_distribution<int> dis_row(0, rows - 1);
-	thread_local std::uniform_int_distribution<int> dis_col(0, cols - 1);
-
-	for (int i = 0; i < iteration; i++)
-	{
-		// flip a random element in our microstate
-		int rand_row = dis_row(gen);
-		int rand_col = dis_col(gen);
-		// we assume to flip the spin at the random location
-		(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
-		// delta E is just 2 times the flipped energy.
-		// doing it this way so we dont need to calculate delta E by going through the entire matrix
-		double deltaE = 2. * Hamiltonian::hamiltonian_periodic_ising_element(rand_row, rand_col, microstate_matrix_ptr, hamiltonian_param_ptr);
-
-		// only reject the change of Delta E > 0 with the probablity e^(-deltaE/T)
-		if (deltaE > 0)
-		{
-			std::uniform_real_distribution<double> dis_double(0.0, 1.0);
-			double random_double = dis_double(gen); // random double is betwen 0 and 1
-			double boltzman_factor = exp(-(deltaE * inverseT));
-			if (random_double > boltzman_factor)
-			{
-				(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
-			}
-		}
-	}
-}
-
-// routine to evolve the microstate gradually from 5* target temperature
-// this routine should always be used when termalizing the microstate
-void Microstate::evolve_microstate_gradual(int iteration)
-{
-	double start_temp = 5 * tempreature; 
-	double target_temp = tempreature;
-	double inverseT = 1. / start_temp;
-	double temp_step = (start_temp - target_temp) / iteration; //calculate the step of temperature given iteration 
-	double current_temp = start_temp;
-	int post_cooling_iteration = rows * cols * 100;    //number of iterations to run after target temp is reached.
-
-	// Set random distribution for row and col
-	thread_local std::uniform_int_distribution<int> dis_row(0, rows - 1);
-	thread_local std::uniform_int_distribution<int> dis_col(0, cols - 1);
-
-	// Evolve the microstate while cooling gradually
-	for (int i = 0; i < iteration; i++)
-	{
-		// Flip a random element in our microstate
-		int rand_row = dis_row(gen);
-		int rand_col = dis_col(gen);
-		(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
-		double deltaE = 2. * Hamiltonian::hamiltonian_periodic_ising_element(rand_row, rand_col, microstate_matrix_ptr, hamiltonian_param_ptr);
-
-		// Only reject the change of Delta E > 0 with the probability e^(-deltaE/T)
-		if (deltaE > 0)
-		{
-			std::uniform_real_distribution<double> dis_double(0.0, 1.0);
-			double random_double = dis_double(gen);
-			double boltzmann_factor = exp(-(deltaE * inverseT));
-			if (random_double > boltzmann_factor)
-			{
-				(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
-			}
-		}
-
-		// Decrease temperature
-		current_temp -= temp_step;
-		inverseT = 1. / current_temp;
-	}
-
-	// Evolve the microstate at the target temperature for post_cooling_iteration iterations
-	inverseT = 1. / target_temp;
-	for (int i = 0; i < post_cooling_iteration; i++)
-	{
-		// Flip a random element in our microstate
-		int rand_row = dis_row(gen);
-		int rand_col = dis_col(gen);
-		(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
-		double deltaE = 2. * Hamiltonian::hamiltonian_periodic_ising_element(rand_row, rand_col, microstate_matrix_ptr, hamiltonian_param_ptr);
-
-		// Only reject the change of Delta E > 0 with the probability e^(-deltaE/T)
-		if (deltaE > 0)
-		{
-			std::uniform_real_distribution<double> dis_double(0.0, 1.0);
-			double random_double = dis_double(gen);
-			double boltzmann_factor = exp(-(deltaE * inverseT));
-			if (random_double > boltzmann_factor)
-			{
-				(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
-			}
-		}
-	}
-}
-
 // graph the evolution process
 // this implementation is rather janky as I needed to use sleep to halt the program
 // time is the total time in seconds where the graph will show up
 // with a frame rate of field fps.
+
 void Microstate::graph_evolve(double time, int evolve_iteration, int fps)
 {    
 	double t = 0.0;
@@ -228,3 +161,68 @@ void Microstate::graph_evolve(double time, int evolve_iteration, int fps)
 		system("clear");
 	}
 }
+
+//***************************************************************************************************************************************
+//*********************************************************MCMC Algorithm****************************************************************
+//***************************************************************************************************************************************
+
+// source code to evolve microstate once
+void Microstate::evolve_microstate_once()
+{
+	int rand_row = random_integer(rows);
+	int rand_col = random_integer(cols);
+
+	(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
+	// delta E is just 2 times the flipped energy.
+	// doing it this way so we dont need to calculate delta E by going through the entire matrix
+	double deltaE = 2. * Hamiltonian::hamiltonian_periodic_ising_element(rand_row, rand_col, microstate_matrix_ptr, hamiltonian_param_ptr);
+
+	// only reject the change of Delta E > 0 with the probablity e^(-deltaE/T)
+	if (deltaE > 0)
+	{      
+		double boltzman_factor = std::exp(-(deltaE)/temperature);
+		double random_double = random_unitary_double();
+		if (random_double > boltzman_factor) // if the random double is greater than the boltzman factor, we flip spin back.
+		{
+			(*microstate_matrix_ptr)(rand_row, rand_col) *= -1.;
+		}
+	}
+
+}
+
+// routine to perform the Matropolis algorithm on a microstate for a given iteration
+// this routines only update a current microstate
+void Microstate::evolve_microstate(int iteration)
+{
+#pragma omp parallel for
+	for(int i = 0; i < iteration; i++)
+	{
+		evolve_microstate_once();
+
+	}
+}
+
+// routine to evolve the microstate gradually from 5* target temperature
+// this routine should always be used when termalizing the microstate
+void Microstate::evolve_microstate_gradual(int iteration)
+{
+
+	double target_temp = temperature;
+	double current_temp = 5 * temperature; 
+
+	temperature = current_temp;
+
+	double const TEMPERATURE_STEPS = 31;
+	int const COOLING_ITERATION = rows * cols * 10; 
+
+	for(int i = 0; i < TEMPERATURE_STEPS; i++)
+	{
+		evolve_microstate(COOLING_ITERATION);
+		current_temp *= 0.95;
+		temperature = current_temp;
+	}
+	// Evolve the microstate at the target temperature for post_cooling_iteration iterations
+	temperature = target_temp;
+	evolve_microstate(iteration);
+}
+

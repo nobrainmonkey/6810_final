@@ -5,7 +5,7 @@
 // Programmer: Xihe Han
 //
 // Revision History:
-//	04/05/2023 origional version
+//	04/05/2023 original version
 //  04/10/2023 added gradual termalize method
 //  04/17/2023 changed parameters needed for graph_evolve
 //***********************************
@@ -18,7 +18,6 @@
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/src/Core/Matrix.h>
 #include "Hamiltonian.h"
-#include <omp.h>
 
 class Microstate
 {
@@ -28,7 +27,7 @@ class Microstate
 		~Microstate(); // destructor
 
 		// public variables
-		double tempreature;
+		double temperature;
 		int rows;
 		int cols;
 		hamiltonian_param_struct *hamiltonian_param_ptr;
@@ -56,6 +55,9 @@ class Microstate
 
 		// initialize the microstate matrix of given dimension row x col
 		void initialize_microstate_matrix(Eigen::MatrixXd *microstate_matrix_ptr);
+		
+		// evolve the microstate once
+		void evolve_microstate_once();
 };
 
 #endif

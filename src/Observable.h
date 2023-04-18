@@ -22,11 +22,11 @@ namespace Observable
 	// function prototype for calculating
 	// energy of a microstate of a given
 	// dimension row x col and a given
-	// hamiltonian parameters.
+	// Hamiltonian parameters.
 	double get_ising_energy(int row, int col, double T, int iteration, int sample_size, hamiltonian_param_struct *hamiltonian_param_ptr);
 
 	// function prototype for calculating
-	// heat capcity of a microstate of a given
+	// heat capacity of a microstate of a given
 	// dimension row x col by using numerical differentiation
 	// dE/dT with step dT and a given hamiltonian parameters.
 	double get_ising_heat_capacity(int row, int col, double T, int iteration, int sample_size, hamiltonian_param_struct *hamiltonian_param_ptr);

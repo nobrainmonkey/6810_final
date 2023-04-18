@@ -8,7 +8,7 @@
 //	04/06/2023: original version
 //	04/10/2023: Added integration routine 
 //	04/13/2023: Added Cv, chi calculation
-//	04/17/2023: fixed prefactors
+//	04/17/2023: fixed pre-factors
 //
 //**************************************************************
 
@@ -17,8 +17,8 @@
 #include <omp.h>
 #include <iomanip>
 
-// integrating using simspons rule if the number of points in x is odd
-// and when the number of points is even, this routine is back to trapozodial rule
+// integrating using Simpsons rule if the number of points in x is odd
+// and when the number of points is even, this routine is back to trapezoidal rule
 double integrate(std::vector<double> x, std::vector<double> y)
 {
 	int n = x.size();
@@ -35,8 +35,8 @@ double integrate(std::vector<double> x, std::vector<double> y)
 	double integral = (h / 3.0) * (y[0] + y[n - 1] + 4.0 * sum_odd + 2.0 * sum_even);
 	return integral;
 }
-// return the ising energy of the single spin by doing the folowing:
-// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equalibrium
+// return the Ising energy of the single spin by doing the following:
+// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equilibrium
 // 2. keep evolving the microstate for `mc_steps` amount of time, record the energy for each evolution, and average the energy
 // 3. return to step one for `sample_size` amount of time, record the averaged energy each time, and finally average all the samples
 // 4. return the total sample energy per spin.
@@ -48,14 +48,14 @@ double Observable::get_ising_energy(int row, int col, double T, int iteration, i
 	{
 		Microstate *microstate_ptr = new Microstate(row, col, T, hamiltonian_param_ptr);
 
-		// evolve the microstate to reach equalibruim
+		// evolve the microstate to reach equilibrium
 		microstate_ptr->evolve_microstate_gradual(iteration);
 
 		// create a list to store energy after some iterations
-		// we choose a list because it is dynamically sizedomp_set_num_threads(8);
+		// we choose a list because it is dynamically sized
 		// and thread safe in case we ant to use omp.
 
-		// after reaching equalibrium, we want to https://discordapp.com/channels/@me/1028655396090544259 further
+		// after reaching equilibrium, we want to https://discordapp.com/channels/@me/1028655396090544259 further
 		// evolve it 1000 time and record energy for each time
 		// and take the final average.
 		int mc_steps = iteration / 10; // amount of step to take average
@@ -74,8 +74,8 @@ double Observable::get_ising_energy(int row, int col, double T, int iteration, i
 	return total_sample_energy / (double(sample_size));
 }
 
-// return the ising heat capacity of the single spin by doing the folowing:
-// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equalibrium
+// return the Ising heat capacity of the single spin by doing the following:
+// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equilibrium
 // 2. keep evolving the microstate for `mc_steps` amount of time, record the energy for each evolution, and use Cv = (<E^2> - <E>^2)/T^2 to calcualte C_v
 // 3. return to step one for `sample_size` amount of time, record the averaged energy each time, calculate Cv, and finally average all the samples
 // 4. return the total sample specific heat per spin.
@@ -86,10 +86,10 @@ double Observable::get_ising_heat_capacity(int row, int col, double T, int itera
 	for (int i = 0; i < sample_size; i++)
 	{
 		Microstate *microstate_ptr = new Microstate(row, col, T, hamiltonian_param_ptr);
-		microstate_ptr->evolve_microstate_gradual(iteration); // bring system into thermal equalibrium
+		microstate_ptr->evolve_microstate_gradual(iteration); // bring system into thermal equilibrium
 		double E = 0.;
 		double Esq = 0.;
-		int mc_steps = iteration / 10; // steps after thermal equalibrium
+		int mc_steps = iteration / 10; // steps after thermal equilibrium
 		for (int i = 0; i < mc_steps; i++)
 		{
 			microstate_ptr->evolve_microstate(1);
@@ -107,7 +107,7 @@ double Observable::get_ising_heat_capacity(int row, int col, double T, int itera
 	return total_sample_heat_capacity / (double)sample_size;
 }
 
-// Reutrn the entropy of a microstate by dong the intergral
+// Return the entropy of a microstate by dong the integral
 // S(T) = int_{0} ^{T} C_v / T dT
 double Observable::get_ising_entropy(std::vector<double> T, std::vector<double> Cv)
 {
@@ -122,8 +122,8 @@ double Observable::get_ising_entropy(std::vector<double> T, std::vector<double> 
 	return entropy;
 }
 
-// return the ising magnetization of the single spin by doing the folowing:
-// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equalibrium
+// return the ising magnetization of the single spin by doing the following:
+// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equilibrium
 // 2. keep evolving the microstate for `mc_steps` amount of time, record the magnetization for each evolution, and average the magnetization
 // 3. return to step one for `sample_size` amount of time, record the averaged magnetization each time, and finally average all the samples
 // 4. return the total sample magnetization per spin.
@@ -135,14 +135,14 @@ double Observable::get_ising_m(int row, int col, double T, int iteration, int sa
 	{
 		Microstate *microstate_ptr = new Microstate(row, col, T, hamiltonian_param_ptr);
 
-		// evolve the microstate to reach equalibruim
+		// evolve the microstate to reach equilibrium
 		microstate_ptr->evolve_microstate_gradual(iteration);
 
 		// create a list to store energy after some iterations
 		// we choose a list because it is dynamically sized
 		// and thread safe in case we ant to use omp.
 
-		// after reaching equalibrium, we want to https://discordapp.com/channels/@me/1028655396090544259 further
+		// after reaching equilibrium, we want to https://discordapp.com/channels/@me/1028655396090544259 further
 		// evolve it 1000 time and record energy for each time
 		// and take the final average.
 		int mc_steps = iteration / 10; // amount of step to take average
@@ -160,8 +160,8 @@ double Observable::get_ising_m(int row, int col, double T, int iteration, int sa
 	return total_sample_m / double(sample_size);
 }
 
-// return the ising chi of the single spin by doing the folowing:
-// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equalibrium
+// return the ising chi of the single spin by doing the following:
+// 1. initialize a microstate, evolve the microstate for `iteration` times so it reaches thermal equilibrium
 // 2. keep evolving the microstate for `mc_steps` amount of time, record the energy for each evolution, and use Chi = (<M^2> - <M>^2)/T to calcualte Chi
 // 3. return to step one for `sample_size` amount of time, record the averaged magnetization each time, calculate Chi, and finally average all the samples
 // 4. return the total Chi per spin.
@@ -172,10 +172,10 @@ double Observable::get_ising_chi(int row, int col, double T, int iteration, int 
 	for (int i = 0; i < sample_size; i++)
 	{
 		Microstate *microstate_ptr = new Microstate(row, col, T, hamiltonian_param_ptr);
-		microstate_ptr->evolve_microstate_gradual(iteration); // bring system into thermal equalibrium
+		microstate_ptr->evolve_microstate_gradual(iteration); // bring system into thermal equilibrium
 		double m = 0.;
 		double msq = 0.;
-		int mc_steps = iteration / 10; // steps after thermal equalibrium
+		int mc_steps = iteration / 10; // steps after thermal equilibrium
 		for (int i = 0; i < mc_steps; i++)
 		{
 			microstate_ptr->evolve_microstate(1);
@@ -183,7 +183,7 @@ double Observable::get_ising_chi(int row, int col, double T, int iteration, int 
 			m += magnetization;
 			msq += magnetization * magnetization;
 		}
-		// calculate averaged magnetication
+		// calculate averaged magnetization
 		double m_avg = m / mc_steps;
 		double msq_avg = msq / mc_steps;
 		// calculate chi per spin

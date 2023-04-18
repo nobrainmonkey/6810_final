@@ -1,5 +1,5 @@
 // Filename: main.cpp
-// main routine for running a ising model MCMC chain 
+// main routine for running a Ising model MCMC chain 
 //
 // Author: Xihe Han
 //
@@ -7,7 +7,7 @@
 //	4/3/2023 - initial commit
 //	4/7/2023 - added cli menu
 //	4/8/2023 - added entropy calculation 
-//	4/16/2023 - added microstate grahing mode and gnuplot pipe.
+//	4/16/2023 - added microstate graphing mode and gnuplot pipe.
 //
 //////////////////////////////////////////////////////////////////////////
 
@@ -50,7 +50,7 @@ int main()
 	std::vector<double> Chi;
 	std::vector<double> S;
 
-	// answer to break out of the cli interfac
+	// answer to break out of the cli interface
 	int answer = 1, answer2 = 1;
 
 	// the cli interface 
@@ -72,8 +72,8 @@ int main()
 			cout << "[10] dT = " << dT << endl;
 			cout << "______________________________________"<<endl;
 			cout << "Current Graphing Mode Parameters:"<<endl;
-			cout << "Parameters cow and rol number are inherented from above:"<<endl;
-			cout << "[11] graphing Tempreature = " << graph_T <<"\t";
+			cout << "Parameters cow and rol number are inherited from above:"<<endl;
+			cout << "[11] graphing Temperature = " << graph_T <<"\t";
 			cout << "[12] graphing time = " << graph_time <<"\t";
 			cout << "[13] graphing iteration per frame = " << graph_iteration_skip << "\t" << endl;
 			cout << "[14] graphing fps = " << graphing_fps << "\t \t" << endl;
@@ -110,12 +110,12 @@ int main()
 				case 6:
 					cout << " enter row: ";
 					cin >> row;
-					iteration = row * col * 1000;
+					iteration = row * col * 100;
 					break;
 				case 7:
 					cout << " enter col: ";
 					cin >> col;
-					iteration = row * col * 1000;
+					iteration = row * col * 100;
 					break;
 				case 8:
 					cout << " enter Tmin: ";
@@ -149,7 +149,7 @@ int main()
 				case 15:
 					cout << " enter to start graphing";
 					Microstate *microstate_ptr = new Microstate(row, col, graph_T, hamiltonian_param_ptr);
-					microstate_ptr->tempreature = graph_T;
+					microstate_ptr->temperature = graph_T;
 					microstate_ptr->graph_evolve(graph_time, graph_iteration_skip, graphing_fps);
 					delete microstate_ptr;
 					break;
@@ -174,7 +174,7 @@ int main()
 		string file_name = file_name_string.str();
 		my_out.open(file_name.c_str(), ofstream::trunc);
 
-		my_out << "tempreature/J"
+		my_out << "temperature/J"
 			<< " " << std::setw(30)
 			<< "E/J" << std::setw(37) << " "
 			<< "Cv"
@@ -183,7 +183,7 @@ int main()
 			<< " " << std::setw(36)
 			<< "chi" << std::endl;
 
-		// stepping through temperatures and gather macrosopic quantities at each temperature.
+		// stepping through temperatures and gather macroscopic quantities at each temperature.
 		for (double temp = Tmin; temp < Tmax; temp += dT)
 		{
 			std:: cout << "Evaluating Quantities at T = " << temp << std::endl;
