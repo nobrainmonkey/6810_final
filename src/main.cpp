@@ -29,9 +29,9 @@ int main() {
   int row = 10;      // default number of rows to initialize microstate
   int col = 10;      // default number of cols to initialize microstate
   int sample = 200;  // numbers of samples (simulations) to average against
-  double Tmin = 0.5; // min temperature for evaluation
-  double Tmax = 6;   // max temperature for evaluation
-  double dT = 0.1;   // temperature step for macroscopic quantities
+  double Tmin = 2.0; // min temperature for evaluation
+  double Tmax = 2.6;   // max temperature for evaluation
+  double dT = 0.01;   // temperature step for macroscopic quantities
   int iteration =
       row * col * 1000; // efault number of iterations in each MCMC simulation
 
@@ -50,10 +50,9 @@ int main() {
   std::vector<double> S;   // vector to store entropy
 
   // answer to break out of the cli interface
-  int answer = 1, answer2 = 1;
+  int answer = 1;
 
   // the cli interface
-  while (answer2 != 0) {
     answer = 1;
     while (answer != 0) {
       cout << "\nCurrent Calculation Parameters:\n";
@@ -273,9 +272,6 @@ int main() {
     fflush(gnuplotPipe);
     pclose(gnuplotPipe);
 
-    cout << "Again? (no=0, clear=1) ";
-    cin >> answer2;
-  }
   std::cout << "done!" << std::endl;
   return 0;
 }

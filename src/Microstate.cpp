@@ -33,7 +33,7 @@
 //***************************************************************************************************************************************
 
 // declearing random number generator using mt19937
-std::mt19937 global_rng(std::random_device{}());
+thread_local std::mt19937 global_rng(std::random_device{}());
 
 // generate a random integer between 0 and N-1
 int random_integer(int N) {
