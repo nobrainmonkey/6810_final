@@ -5,7 +5,7 @@
 // Programmer: Xihe Han
 //
 // Revision history:
-//	04/05/2023 Origianal version
+//      04/05/2023 Origianal version
 //*****************************************************
 
 // include files

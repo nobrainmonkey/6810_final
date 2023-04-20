@@ -5,10 +5,10 @@
 // Programmer: Xihe Han
 //
 // Version history:
-//	04/06/2023: original version
-//	04/10/2023: Added integration routine
-//	04/13/2023: Added Cv, chi calculation
-//	04/17/2023: fixed pre-factors
+//      04/06/2023: original version
+//      04/10/2023: Added integration routine
+//      04/13/2023: Added Cv, chi calculation
+//      04/17/2023: fixed pre-factors
 //
 //**************************************************************
 
@@ -34,6 +34,7 @@ double integrate(std::vector<double> x, std::vector<double> y) {
       (h / 3.0) * (y[0] + y[n - 1] + 4.0 * sum_odd + 2.0 * sum_even);
   return integral;
 }
+
 // return the Ising energy of the single spin by doing the following:
 // 1. initialize a microstate, evolve the microstate for `iteration` times so it
 // reaches thermal equilibrium
@@ -62,12 +63,12 @@ Observable::get_ising_energy(int row, int col, double T, int iteration,
     // after reaching equilibrium, we want to
     // https://discordapp.com/channels/@me/1028655396090544259 further evolve it
     // 1000 time and record energy for each time and take the final average.
-    int mc_steps = iteration / 10; // amount of step to take average
-                                   // get the total amount of energy over the
-                                   // num_average iterations of the microstate.
+    int mc_steps = 200; // amount of step to take average
+    // get the total amount of energy over the
+    // num_average iterations of the microstate.
     double total_energy = 0;
     for (int i = 0; i < mc_steps; i++) {
-      microstate_ptr->evolve_microstate(1);
+      microstate_ptr->evolve_microstate(row * col);
       total_energy += (Hamiltonian::hamiltonian_periodic_ising_microstate(
           microstate_ptr->get_microstate_matrix_ptr(), hamiltonian_param_ptr));
     }
@@ -100,9 +101,9 @@ double Observable::get_ising_heat_capacity(
         iteration); // bring system into thermal equilibrium
     double E = 0.;
     double Esq = 0.;
-    int mc_steps = iteration / 10; // steps after thermal equilibrium
+    int mc_steps = 200; // steps after thermal equilibrium
     for (int i = 0; i < mc_steps; i++) {
-      microstate_ptr->evolve_microstate(1);
+      microstate_ptr->evolve_microstate(row * col);
       double energy = Hamiltonian::hamiltonian_periodic_ising_microstate(
           microstate_ptr->get_microstate_matrix_ptr(), hamiltonian_param_ptr);
       E += energy;
@@ -126,7 +127,7 @@ double Observable::get_ising_entropy(std::vector<double> T,
                                      std::vector<double> Cv) {
   int size = T.size();
   std::vector<double> integrand; // integrand is Cv/T
-                                 // prepare the integrand with given Cv and T
+  // prepare the integrand with given Cv and T
   for (int i = 0; i < size; i++) {
     integrand.push_back(Cv[i] / T[i]);
   }
@@ -162,12 +163,12 @@ Observable::get_ising_m(int row, int col, double T, int iteration,
     // after reaching equilibrium, we want to
     // https://discordapp.com/channels/@me/1028655396090544259 further evolve it
     // 1000 time and record energy for each time and take the final average.
-    int mc_steps = iteration / 10; // amount of step to take average
-                                   // get the total amount of energy over the
-                                   // num_average iterations of the microstate.
+    int mc_steps = 200; // amount of step to take average
+    // get the total amount of energy over the
+    // num_average iterations of the microstate.
     double total_m = 0;
     for (int i = 0; i < mc_steps; i++) {
-      microstate_ptr->evolve_microstate(1);
+      microstate_ptr->evolve_microstate(row * col);
       total_m +=
           std::fabs((microstate_ptr->get_microstate_matrix_ptr())->sum());
     }
@@ -199,9 +200,9 @@ Observable::get_ising_chi(int row, int col, double T, int iteration,
         iteration); // bring system into thermal equilibrium
     double m = 0.;
     double msq = 0.;
-    int mc_steps = iteration / 10; // steps after thermal equilibrium
+    int mc_steps = 200; // steps after thermal equilibrium
     for (int i = 0; i < mc_steps; i++) {
-      microstate_ptr->evolve_microstate(1);
+      microstate_ptr->evolve_microstate(row * col);
       double magnetization = microstate_ptr->get_microstate_matrix_ptr()->sum();
       m += magnetization;
       msq += magnetization * magnetization;

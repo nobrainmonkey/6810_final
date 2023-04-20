@@ -6,7 +6,7 @@ HEADER=Hamiltonian.h Microstate.h Observable.h
 EIGEN_PATH=
 OUT=calculate.x
 CC= g++
-FLAGS= -Wall -O3 -march=native -fopenmp -std=c++11
+FLAGS=-Wall -O3 -march=native -fopenmp -std=c++11
 LFLAGS= 
 
 all:$(OBJS)

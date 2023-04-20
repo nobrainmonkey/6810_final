@@ -5,14 +5,12 @@
 // Programmer: Xihe Han
 //
 // Version history:
-//	04/06/2023: original version
-//	04/13/2023: Added Cv, chi calculation
+//      04/06/2023: original version
+//      04/13/2023: Added Cv, chi calculation
 //
 //**************************************************************
-
 #ifndef OBSERVABLE_H
 #define OBSERVABLE_H
-
 // include files
 #include "Microstate.h"
 #include <vector>

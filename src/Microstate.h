@@ -5,7 +5,7 @@
 // Programmer: Xihe Han
 //
 // Revision History:
-//	04/05/2023 original version
+//      04/05/2023 original version
 //  04/10/2023 added gradual termalize method
 //  04/17/2023 changed parameters needed for graph_evolve
 //***********************************
@@ -53,7 +53,7 @@ public:
 
 private:
   Eigen::MatrixXd *microstate_matrix_ptr; // microstate matrix that represents
-                                          // the 2-D lattice
+  // the 2-D lattice
 
   // initialize the microstate matrix of given dimension row x col
   void initialize_microstate_matrix(Eigen::MatrixXd *microstate_matrix_ptr);
