@@ -16,9 +16,9 @@ where $X$ is some directly sampled quantity, and $N$ is the sample size. Suppose
 $$
 \frac{\Delta X}{X} \sim \frac{1}{\sqrt{N N'}} \leq \sqrt{\frac{1}{N} + \frac{1}{N'}} \tag{1}
 $$
-This is a very drastic simplification of the actual problem. While each sample is indeed uncorrelated (up to the RNG process), the process of taking the average of multiple Monte-Carlo steps in one sample($N'$) is certainly correlated. In an ideal world, we should find the correlation "time" (number of MC steps) and decouple the correlation, but finding the correlation time itself could be computationally taxing.
+This is a very drastic simplification of the actual problem. While each sample is indeed uncorrelated (up to the RNG process), the process of taking the average of multiple Monte-Carlo steps in one sample($N'$) is certainly correlated. In an ideal world, we should find the correlation time via autocorrelation function (number of MC steps) and decouple the correlation, but finding the correlation time itself could be computationally taxing.
 
-By the power of physics intuition:tm:, we can estimate the correlation length to be on the order of $L^2$- the two-dimensional size of the lattice. This is because since the Metropolis algorithm are flipping a random spin each step, we could expect the spins to decouple after the number of expectation of the size of the lattice. 
+By the power of physics intuition:tm:, we can estimate the correlation time to be on the order of $L^2$- the two-dimensional size of the lattice. This is because since the Metropolis algorithm are flipping a random spin each step, we could expect the spins to decouple after the number of expectation of the size of the lattice. 
 
 Here is my code implementation to address the auto-correlation issue:
 
@@ -28,7 +28,7 @@ Here is my code implementation to address the auto-correlation issue:
                                    // num_average iterations of the microstate.
     double total_energy = 0;
     for (int i = 0; i < mc_steps; i++) {
-      microstate_ptr->evolve_microstate(row * col); // remove auto correlation
+      microstate_ptr->evolve_microstate(row * col * 5); // remove autocorrelation
       total_energy += (Hamiltonian::hamiltonian_periodic_ising_microstate(
           microstate_ptr->get_microstate_matrix_ptr(), hamiltonian_param_ptr));
     }
@@ -57,12 +57,7 @@ I have compiled a [file](Analysis_data.xlsx) that contains the raw data and erro
 
 Specifically, I analyzed the error on $T_c$ by subtracting the numerical maximum of $C_v$ with Onsager's exact solution. This gives us the behavior of truncation error near the critical region. This is the result: ![](deltaTc_vs_L.png)
 
-Our result is relative messy. However, I think we do observe a logarithmic relationship between the relative error in $T_c$ and the lattice length $L$. A semi-log graph on $L$ gives: ![](/home/xihe/6810_final/docs/deltaTc_vs_ln(L).png)
-
-Where we can kind of see a linear relation. A $0.92$ $R^2$ value is certainly not compelling, and my sampling are limited by the step size $\Delta T =0.01$. I am still inclined to believe that 
-$$
-\Delta T_c \sim O(-\ln L)
-$$
+Our result is relative messy. However, we can at least see a decreasing trend of the relative error of $T_c$ as $L$ increaes.
 
 
 #### Asymptotic Error
@@ -135,7 +130,7 @@ We can see that the bottleneck is in `Microstate::evolve_microstate_once()`. I c
 
 Although we have achieve most of the functionality that were intended, there are certainly more optimizations that we can do:
 
-1. Do not use `Eigen`for matrix representation to represent our micro-state. This is a design error made by me from early-on. For our purpose, the "matrix" is nothing but a list of numbers, and we do not require any transformation of matrix actions. Therefore, using `Eigen` will create overhead. Instead, we should use a row-major `std::vector` flat vector array for better memory layout.[^3]
+1. Do not use `Eigen`for matrix representation to represent our micro-state. This is a design error made by me from early-on. For our purpose, the "matrix" is nothing but a list of numbers, and we do not require any transformation of matrix actions. Therefore, using `Eigen` will create overhead. Instead, we should use a col-major `std::vector` flat vector array for better memory layout.[^3]
 2. In `Microstate.cpp`, the `evolve_once` method is evaluating the Boltzmann factor every time each spin flip happens.  However, this is very unnecessary because for our problem, the Boltzmann factor can only be `{-8,-4,0,4,8} * J + 2 * h`. Therefore, a more effective way is to created a `map` with `{key= DeltaE, value = exp(-DeltaE/temperature)}`. This will be faster because `map` look-up time is lower than `exp()`function call.
 3. As we discovered, quantities near $T_c$ has more variance. Therefore, our code should ideally be adaptive with parameter $t=(T-T_c)/T_c$.
 4. Near $T_c$, we should probably have a probability of flipping not only a random spin, but its closest neighbors as well. I have thought about implementing this but I didn't have time, and I believe this is a already established algorithm from things I heard from my statistical mechanics class. 

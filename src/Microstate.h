@@ -18,8 +18,8 @@
 #include "Hamiltonian.h"
 #include <eigen3/Eigen/Dense>
 #include <eigen3/Eigen/src/Core/Matrix.h>
+#include <map>
 #include <omp.h>
-
 class Microstate {
 public:
   Microstate(int row, int col, double temp,
@@ -51,6 +51,7 @@ public:
   // evolve the microstate gradually with a start temp and a target temp
   void evolve_microstate_gradual(int iteration);
 
+
 private:
   Eigen::MatrixXd *microstate_matrix_ptr; // microstate matrix that represents
   // the 2-D lattice
@@ -60,6 +61,7 @@ private:
 
   // evolve the microstate once
   void evolve_microstate_once();
+
 };
 
 #endif

@@ -26,6 +26,7 @@
 #include <omp.h>
 #include <random>
 #include <thread>
+#include <vector>
 
 //***************************************************************************************************************************************
 //**********************************************************RNG
@@ -39,18 +40,18 @@ thread_local std::mt19937 global_rng(std::random_device{}
 
 // generate a random integer between 0 and N-1
 int random_integer(int N) {
-  thread_local std::uniform_int_distribution<int> dist(0, N - 1);
+  std::uniform_int_distribution<int> dist(0, N - 1);
   return dist(global_rng);
 }
 
 // generate a random double between 0 and 1
 double random_unitary_double() {
-  thread_local std::uniform_real_distribution<double> dist(0, 1);
+  std::uniform_real_distribution<double> dist(0, 1);
   return dist(global_rng);
 }
 
 int random_sign() {
-  thread_local std::uniform_int_distribution<int> dist(0, 1);
+  std::uniform_int_distribution<int> dist(0, 1);
   int sign = dist(global_rng) * 2 - 1;
   return double(sign);
 }
@@ -86,6 +87,7 @@ void Microstate::initialize_microstate_matrix(
     }
   }
 }
+
 
 // getter function for the microstate matrix
 Eigen::MatrixXd *Microstate::get_microstate_matrix_ptr() {
@@ -169,7 +171,7 @@ void Microstate::evolve_microstate_once() {
 
   // only reject the change of Delta E > 0 with the probablity e^(-deltaE/T)
   if (deltaE > 0) {
-    double boltzman_factor = std::exp(-(deltaE) / temperature);
+    double boltzman_factor = std::exp(-deltaE/temperature);
     double random_double = random_unitary_double();
     if (random_double >
         boltzman_factor) // if the random double is greater than the boltzman
@@ -197,7 +199,6 @@ void Microstate::evolve_microstate_gradual(int iteration) {
   double current_temp = 5 * temperature;
 
   temperature = current_temp;
-
   double const TEMPERATURE_STEPS = 31;
   int const COOLING_ITERATION = rows * cols * 50;
 

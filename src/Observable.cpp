@@ -68,7 +68,8 @@ Observable::get_ising_energy(int row, int col, double T, int iteration,
     // num_average iterations of the microstate.
     double total_energy = 0;
     for (int i = 0; i < mc_steps; i++) {
-      microstate_ptr->evolve_microstate(row * col);
+      microstate_ptr->evolve_microstate(row * col * 5); // evolve the microstate 5 sweeps to get rid 
+                                                        // of autocorrelation
       total_energy += (Hamiltonian::hamiltonian_periodic_ising_microstate(
           microstate_ptr->get_microstate_matrix_ptr(), hamiltonian_param_ptr));
     }
@@ -103,7 +104,7 @@ double Observable::get_ising_heat_capacity(
     double Esq = 0.;
     int mc_steps = 200; // steps after thermal equilibrium
     for (int i = 0; i < mc_steps; i++) {
-      microstate_ptr->evolve_microstate(row * col);
+      microstate_ptr->evolve_microstate(row * col * 5); //evolve it for five sweeps
       double energy = Hamiltonian::hamiltonian_periodic_ising_microstate(
           microstate_ptr->get_microstate_matrix_ptr(), hamiltonian_param_ptr);
       E += energy;
@@ -173,7 +174,7 @@ Observable::get_ising_m(int row, int col, double T, int iteration,
           std::fabs((microstate_ptr->get_microstate_matrix_ptr())->sum());
     }
     double average_m = total_m / mc_steps;
-    total_sample_m += average_m / double(row * col);
+    total_sample_m += average_m / double(row * col * 5); // evolve it for 5 sweeps
     delete microstate_ptr;
   }
   return total_sample_m / double(sample_size);
@@ -202,7 +203,7 @@ Observable::get_ising_chi(int row, int col, double T, int iteration,
     double msq = 0.;
     int mc_steps = 200; // steps after thermal equilibrium
     for (int i = 0; i < mc_steps; i++) {
-      microstate_ptr->evolve_microstate(row * col);
+      microstate_ptr->evolve_microstate(row * col * 5); // evolve it for 5 sweeps
       double magnetization = microstate_ptr->get_microstate_matrix_ptr()->sum();
       m += magnetization;
       msq += magnetization * magnetization;
